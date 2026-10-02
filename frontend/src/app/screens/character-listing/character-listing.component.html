@@ -1,0 +1,59 @@
+<p>character-listing works!</p>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-3">
+
+  <div class="flex flex-col items-center p-5 border border-purple-700">
+    add char 
+  </div>
+
+
+  @for(char of characters(); track char.row_id;){
+  <div class="flex flex-col items-center p-5 pt-3 border border-purple-700">
+    <div class="text-purple-600 underline cursor-pointer py-2 px-4" (click)="clickCharacter(char.row_id)">{{char.name}}</div>
+    <div>Level {{char.level}} {{char.class_name}}</div>
+    <div>{{ char.subspecies_name != null ? char.subspecies_name : char.species_name }}</div>
+    <div class="flex flex-row gap-10 text-purple-600 underline">
+      <div>Level Up</div>
+      <div>Delete</div>
+    </div>
+  </div>
+
+
+  }
+
+
+
+</div>
+
+
+
+
+
+<table class="border-collapse border border-purple-300 m-2">
+  <tr class="text-left">
+    <th class="p-2">Name</th>
+    <th class="p-2">Level</th>
+    <th class="p-2">Class</th>
+    <th class="p-2">Subclass</th>
+    <th class="p-2">Species</th>
+    <th class="p-2">Subspecies</th>
+  </tr>
+
+  @for(char of characters(); track char.row_id;){
+  <tr class="border border-purple-300">
+    <td class="p-2">{{char.name}}</td>
+    <td class="p-2">{{char.level}}</td>
+    <td class="p-2">{{char.class_name}}</td>
+    <td class="p-2">{{char.subclass_name}}</td>
+    <td class="p-2">{{char.species_name}}</td>
+    <td class="p-2">{{char.subspecies_name}}</td>
+  </tr>
+
+  }
+  @empty{
+  <tr>
+    <td colspan="3">NO DATA LOADED</td>
+  </tr>
+  }
+</table>
+

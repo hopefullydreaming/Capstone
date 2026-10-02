@@ -1,21 +1,73 @@
 <p>classes</p>
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Subclass Level</th>
+<table class="border-collapse border border-purple-300 m-2">
+  <tr class="text-left">
+    <th class="p-2">Name</th>
+    <th class="p-2">Description</th>
+    <th class="p-2 text-center">Subclass Level</th>
   </tr>
 
-  @for(class of classes(); track class.row_id){
-  <tr>
-    <td>{{class.name}}</td>
-    <td>{{class.description}}</td>
-    <td>{{class.subclass_level}}</td>
-  </tr>
+  @for(class of classes(); track class.row_id;){
+  <tr class="border border-purple-300">
+    <td class="p-2">{{class.name}}</td>
+    <td class="p-2">{{class.description}}</td>
+    <td class="p-2 text-center">{{class.subclass_level}}</td>
+  </tr>  
+
   }
   @empty{
     <tr>
-      <td colspan="3">NOTHING</td>
+      <td colspan="3">NO DATA LOADED</td>
+    </tr>
+  }
+</table>
+
+<p>cleric subclasses</p>
+<table class="border-collapse border border-purple-300 m-2">
+  <tr class="text-left">
+    <th class="p-2">Class</th>
+    <th class="p-2">Name</th>
+    <th class="p-2">Description</th>
+  </tr>
+
+  @for(subclass of subclasses(); track subclass.row_id;){
+  <tr class="border border-purple-300">
+    <td class="p-2">{{subclass.class_name}}</td>
+    <td class="p-2">{{subclass.name}}</td>
+    <td class="p-2">{{subclass.description}}</td>
+  </tr>  
+
+  }
+  @empty{
+    <tr>
+      <td colspan="3">NO DATA LOADED</td>
+    </tr>
+  }
+</table>
+
+
+<p>life cleric classFeatures</p>
+<table class="border-collapse border border-purple-300 m-2">
+  <tr class="text-left">
+    <th class="p-2">Class</th>
+    <th class="p-2">Subclass</th>
+    <th class="p-2">Level</th>
+    <th class="p-2">Name</th>
+    <th class="p-2">Description</th>
+  </tr>
+
+  @for(feature of classFeatures(); track feature.row_id;){
+  <tr class="border border-purple-300">
+    <td class="p-2">{{feature.class_name}}</td>
+    <td class="p-2">{{feature.subclass_name}}</td>
+    <td class="p-2">{{feature.level}}</td>
+    <td class="p-2">{{feature.name}}</td>
+    <td class="p-2">{{feature.description}}</td>
+  </tr>  
+
+  }
+  @empty{
+    <tr>
+      <td colspan="3">NO DATA LOADED</td>
     </tr>
   }
 </table>
