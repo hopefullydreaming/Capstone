@@ -12,7 +12,7 @@ export class DataService {
   private apiUrlSubclassCleric = 'http://localhost:3000/api/subclass/3';
   private apiUrlLifeCleric = 'http://localhost:3000/api/class_features/3/6';
   private apiUrlCharacterListing = 'http://localhost:3000/api/character';
-  private apiUrlCharacterRecord = 'http://localhost:3000/api/character/15';
+  private apiUrlCharacterRecord = 'http://localhost:3000/api/character/';
 
   constructor(private http: HttpClient) {}
 
@@ -31,7 +31,7 @@ export class DataService {
   getCharacterListing(): Observable<CharacterListing[]> {
     return this.http.get<CharacterListing[]>(this.apiUrlCharacterListing);
   }
-  getCharacterRecord(): Observable<CharacterRecord> {
-    return this.http.get<CharacterRecord>(this.apiUrlCharacterRecord);
+  getCharacterRecord(row_id: number): Observable<CharacterRecord> {
+    return this.http.get<CharacterRecord>(this.apiUrlCharacterRecord + row_id);
   }
 }

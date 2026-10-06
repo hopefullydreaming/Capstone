@@ -1,1 +1,198 @@
-<p>character-edit.component works!</p>
+<div class="p-4">
+
+    @if(character()){
+    <p class="text-xl">{{character().name}}</p>
+    <p>{{character().background_name}} {{character().subspecies_name ?? character().species_name}}</p>
+    <p>Level {{character().level}} {{character().subclass_name}} {{character().class_name}}</p>
+
+    <table class="border border-collapse border-purple-300">
+        <thead>
+            <tr>
+                <th class="p-2 border border-purple-300">STR</th>
+                <th class="p-2 border border-purple-300">DEX</th>
+                <th class="p-2 border border-purple-300">CON</th>
+                <th class="p-2 border border-purple-300">INT</th>
+                <th class="p-2 border border-purple-300">WIS</th>
+                <th class="p-2 border border-purple-300">CHA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{character().strength}}</td>
+                <td class="p-2 border border-purple-300 text-center">{{character().dexterity}}</td>
+                <td class="p-2 border border-purple-300 text-center">{{character().constitution}}</td>
+                <td class="p-2 border border-purple-300 text-center">{{character().intelligence}}</td>
+                <td class="p-2 border border-purple-300 text-center">{{character().wisdom}}</td>
+                <td class="p-2 border border-purple-300 text-center">{{character().charisma}}</td>
+            </tr>
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ character().strength >= 10 ? "+" : "" }}{{ (character().strength - 10) / 2 | floor }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ character().dexterity >= 10 ? "+" : "" }}{{ (character().dexterity - 10) / 2 | floor }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ character().constitution >= 10 ? "+" : "" }}{{ (character().constitution - 10) / 2 | floor }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ character().intelligence >= 10 ? "+" : "" }}{{ (character().intelligence - 10) / 2 | floor }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ character().wisdom >= 10 ? "+" : "" }}{{ (character().wisdom - 10) / 2 | floor }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ character().charisma >= 10 ? "+" : "" }}{{ (character().charisma - 10) / 2 | floor }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>skills</p>
+    <table class="border border-collapse border-purple-300">
+        <tbody>
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("acrobatics") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("acrobatics") }}</td>
+                <td class="p-2 border border-purple-300">Acrobatics</td>
+            </tr>
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("animalHandling") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("animalHandling") }}</td>
+                <td class="p-2 border border-purple-300">Animal Handling</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("arcana") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("arcana") }}</td>
+                <td class="p-2 border border-purple-300">Arcana</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("athletics") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("athletics") }}</td>
+                <td class="p-2 border border-purple-300">Athletics</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("deception") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("deception") }}</td>
+                <td class="p-2 border border-purple-300">Deception</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("history") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("history") }}</td>
+                <td class="p-2 border border-purple-300">History</td>
+            </tr>
+
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("insight") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("insight") }}</td>
+                <td class="p-2 border border-purple-300">Insight</td>
+            </tr>
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("intimidation") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("intimidation") }}</td>
+                <td class="p-2 border border-purple-300">Intimidation</td>
+            </tr>
+
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("investigation") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("investigation") }}</td>
+                <td class="p-2 border border-purple-300">Investigation</td>
+            </tr>
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("medicine") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("medicine") }}</td>
+                <td class="p-2 border border-purple-300">Medicine</td>
+            </tr>
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("nature") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("nature") }}</td>
+                <td class="p-2 border border-purple-300">Nature</td>
+            </tr>
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("perception") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("perception") }}</td>
+                <td class="p-2 border border-purple-300">Perception</td>
+            </tr>
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("performance") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("performance") }}</td>
+                <td class="p-2 border border-purple-300">Performance</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("persuasion") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("persuasion") }}</td>
+                <td class="p-2 border border-purple-300">Persuasion</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("religion") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("religion") }}</td>
+                <td class="p-2 border border-purple-300">Religion</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("sleightOfHand") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("sleightOfHand") }}</td>
+                <td class="p-2 border border-purple-300">Sleight of Hand</td>
+            </tr>
+
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("stealth") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("stealth") }}</td>
+                <td class="p-2 border border-purple-300">Stealth</td>
+            </tr>
+
+
+            <tr>
+                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("survival") }}</td>
+                <td class="p-2 border border-purple-300 text-center">{{ getSkill("survival") }}</td>
+                <td class="p-2 border border-purple-300">Survival</td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <p>data: {{character().data}}</p>
+    }
+
+</div>
+  <!--row_id: number;
+  name: string;
+  level: number;-->
+
+
+  <!--class_row_id: number;
+  class_name?: string;
+  subclass_row_id?: number;
+  subclass_name?: string;-->
+
+  <!--species_row_id: number;
+  species_name?: string;
+  subspecies_row_id?: number;
+  subspecies_name?: string;-->
+
+  <!--background_row_id?: number;
+  background_name?: string;
+  background_description?: string;-->
+
+  <!--strength: number;
+  dexterity: number;
+  constitution: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;-->
+
+<!--data: string;-->
+
+

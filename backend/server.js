@@ -136,12 +136,12 @@ app.get('/api/character/:row_id', async (req, res) => {
             b.name AS class_name, c.name AS subclass_name,
 
             a.species_row_id, a.subspecies_row_id, 
-            d.name AS species_name, e.name AS subspecies_name
+            d.name AS species_name, e.name AS subspecies_name,
 
             a.background_row_id, 
             f.name AS background_name, f.description AS background_description,
 
-a.strength, a.dexterity, a.constitution, a.intelligence, a.wisdom, a.charisma, a.data
+            a.strength, a.dexterity, a.constitution, a.intelligence, a.wisdom, a.charisma, a.data
 
             FROM characters AS a
             
@@ -160,7 +160,7 @@ a.strength, a.dexterity, a.constitution, a.intelligence, a.wisdom, a.charisma, a
 
             WHERE a.row_id = ${row_id}`
         );
-        res.json(rows);
+        res.json(rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -180,7 +180,6 @@ a.strength, a.dexterity, a.constitution, a.intelligence, a.wisdom, a.charisma, a
 
 // Get spcific subclasses
 app.get('/api/subclass/', async (req, res) => {
-        console.log("SUBCLASSES")
     try {
         const [rows] = await db.query(
             `SELECT 
