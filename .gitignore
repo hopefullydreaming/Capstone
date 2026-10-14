@@ -2,3 +2,4 @@
 .vs/
 /node_modules
 run-app.bat
+/enc_temp_folder
