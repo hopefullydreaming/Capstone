@@ -44,18 +44,15 @@ export class CharacterEditComponent {
     });
 
   }
-  /*
-
-
-
-  */
 
   getProf(skill: string): number {
+    if (!this.data.skills) return 0;
     return this.data.skills[skill] ?? 0;
   }
 
   getProfDisplay(skill: string): string {
-    let prof = this.data.skills[skill] ?? 0;
+    let prof = this.getProf(skill);
+
     switch (prof) {
       case 0.5:
         return "JoaT"
@@ -66,32 +63,24 @@ export class CharacterEditComponent {
       default:
         return ""
     }
-
-
   }
 
   getSkill(skill: string): string {
-
     let score = 0;
     
-
     switch (skill) {
       case "acrobatics":
       case "sleightOfHand":
       case "stealth":
         score = this.character().dexterity;
         break;
-        // console.log("dex mod:", this.character().dexterity)
-        // return "dex"
       case "animalHandling":
       case "insight":
       case "medicine":
       case "perception":
       case "survival":
-
         score = this.character().wisdom;
         break;
-        // return "wis"
       case "arcana":
       case "history":
       case "investigation":
@@ -99,20 +88,15 @@ export class CharacterEditComponent {
       case "religion":
         score = this.character().intelligence;
         break;
-        // return "int"
       case "athletics":
-
         score = this.character().strength;
         break;
-        // return "str"
       case "deception":
       case "intimidation":
       case "performance":
       case "persuasion":
-
         score = this.character().charisma;
         break;
-        // return "cha"
     }
 
     let pb = Math.floor(this.character().level / 4) + 2;
@@ -123,7 +107,6 @@ export class CharacterEditComponent {
     if (skillMod >= 0) {
       return "+"+skillMod
     }
-
 
     return `${skillMod}`
 

@@ -1,0 +1,13 @@
+<p>login.component works! form status: {{ form.status }}</p>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+    Email
+    <input formControlName="email" class="border" />
+    <br />
+    Password
+    <input formControlName="password" class="border" />
+    <br />
+    <button type="submit" class="bg-purple-200">submit</button>
+
+</form>
+
