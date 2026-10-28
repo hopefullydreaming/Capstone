@@ -238,9 +238,48 @@ function getUserId(header) {
 
 
 
+//#region species
+
+// Get all species
+app.get('/api/species', authenticateJWT, async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM species');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 
+// Get all subspecies
+app.get('/api/subspecies/', authenticateJWT, async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT 
+
+            a.row_id, a.name, a.description, 
+            a.species_row_id, a.source_row_id, 
+            b.name AS species_name, c.name AS source_name
+
+            FROM subspecies AS a
+            INNER JOIN species AS b
+            ON b.row_id = a.species_row_id
+            INNER JOIN sources AS c
+            ON c.row_id = a.source_row_id`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+//#endregion
+
+//#region classes
 // Get all classes
 app.get('/api/class', authenticateJWT, async (req, res) => {
   try {
@@ -250,6 +289,68 @@ app.get('/api/class', authenticateJWT, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
+// Get all subclasses
+app.get('/api/subclass/', authenticateJWT, async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT 
+
+            a.row_id, a.name, a.description, 
+            a.class_row_id, a.source_row_id, 
+            b.name AS class_name, c.name AS source_name
+
+            FROM subclasses AS a
+            INNER JOIN classes AS b
+            ON b.row_id = a.class_row_id
+            INNER JOIN sources AS c
+            ON c.row_id = a.source_row_id`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Get specific subclasses
+app.get('/api/subclass/:class_row_id', authenticateJWT, async (req, res) => {
+  try {
+    // sanitize
+    let class_id = req.params.class_row_id;
+
+    const [rows] = await db.query(
+      `SELECT 
+            
+            a.row_id, a.name, a.description, 
+            a.class_row_id, a.source_row_id, 
+            b.name AS class_name, c.name AS source_name
+
+            FROM subclasses AS a
+            
+            INNER JOIN classes AS b
+            ON b.row_id = a.class_row_id
+            AND b.row_id = ${class_id}
+            INNER JOIN sources AS c
+            ON c.row_id = a.source_row_id`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+
+
+//#endregion
+
+//#region characters
+
 /* 
 // test data for postman
 {
@@ -268,12 +369,15 @@ app.get('/api/class', authenticateJWT, async (req, res) => {
     "intelligence": 15, 
     "wisdom": 15, 
     "charisma": 15, 
-    "data": "data"
+    "data": "{}"
 }
 */
 
+
+
 // post character
 app.post('/api/character', authenticateJWT, async (req, res) => {
+  let user_id = getUserId(req.headers.authorization);
   try {
 
     let sql = `INSERT INTO characters (
@@ -287,7 +391,7 @@ app.post('/api/character', authenticateJWT, async (req, res) => {
     const values = [[
       null, // row_id, leave this null
 
-      req.body.user_row_id,
+      user_id,
       req.body.class_row_id,
       req.body.subclass_row_id,
 
@@ -406,59 +510,43 @@ app.get('/api/character/:row_id', authenticateJWT, async (req, res) => {
 
 
 
+//#endregion
 
-
-
-
-
-
-
-
-
-
-// Get spcific subclasses
-app.get('/api/subclass/', authenticateJWT, async (req, res) => {
+// Get all backgrounds
+app.get('/api/background/', authenticateJWT, async (req, res) => {
   try {
-    const [rows] = await db.query(
-      `SELECT 
-
-            a.row_id, a.name, a.description, 
-            a.class_row_id, a.source_row_id, 
-            b.name AS class_name, c.name AS source_name
-
-            FROM subclasses AS a
-            INNER JOIN classes AS b
-            ON b.row_id = a.class_row_id
-            INNER JOIN sources AS c
-            ON c.row_id = a.source_row_id`
-    );
+    const [rows] = await db.query('SELECT * FROM backgrounds');
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+//#region features
 
-// Get spcific subclasses
-app.get('/api/subclass/:class_row_id', authenticateJWT, async (req, res) => {
+
+
+
+// Get spcific subspecies
+app.get('/api/species_features/:species_row_id/:subspecies_row_id', authenticateJWT, async (req, res) => {
   try {
     // sanitize
-    let class_id = req.params.class_row_id;
+    let species_id = req.params.species_row_id;
+    let subspecies_id = req.params.subspecies_row_id;
 
     const [rows] = await db.query(
       `SELECT 
             
-            a.row_id, a.name, a.description, 
-            a.class_row_id, a.source_row_id, 
-            b.name AS class_name, c.name AS source_name
+            a.row_id, a.name, a.description, a.is_printed,
+            a.species_row_id, a.subspecies_row_id
 
-            FROM subclasses AS a
+            FROM species_features AS a
             
-            INNER JOIN classes AS b
-            ON b.row_id = a.class_row_id
-            AND b.row_id = ${class_id}
-            INNER JOIN sources AS c
-            ON c.row_id = a.source_row_id`
+            WHERE a.species_row_id = ${species_id}
+            
+            AND a.subspecies_row_id IS NULL OR a.subspecies_row_id = ${subspecies_id}
+            
+            ORDER BY a.subspecies_row_id, a.row_id`
     );
     res.json(rows);
   } catch (err) {
@@ -467,14 +555,14 @@ app.get('/api/subclass/:class_row_id', authenticateJWT, async (req, res) => {
 });
 
 
-
-
 // Get spcific subclasses
-app.get('/api/class_features/:class_row_id/:subclass_row_id', authenticateJWT, async (req, res) => {
+app.get('/api/class_features/:class_row_id/:subclass_row_id/:level', authenticateJWT, async (req, res) => {
   try {
     // sanitize
     let class_id = req.params.class_row_id;
     let subclass_id = req.params.subclass_row_id;
+    let level = req.params.level;
+    // console.log("LEVEL:", level)
 
     const [rows] = await db.query(
       `SELECT 
@@ -491,16 +579,19 @@ app.get('/api/class_features/:class_row_id/:subclass_row_id', authenticateJWT, a
             LEFT JOIN subclasses AS c
             ON c.row_id = a.subclass_row_id
 
-            WHERE a.subclass_row_id IS NULL OR a.subclass_row_id = ${subclass_id}
+            WHERE a.level <= ${level}
+            AND (a.subclass_row_id IS NULL OR a.subclass_row_id = ${subclass_id})
+
             
             ORDER BY a.level, a.subclass_row_id, a.row_id`
     );
+    // console.log("ROWS: ", rows)
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
+//#endregion
 
 
 // Start server

@@ -31,6 +31,10 @@ export class CharacterListingComponent {
     this.router.navigate(['/character', row_id]);
   }
 
+  addCharacter() {
+    this.router.navigate(['/character/new']);
+  }
+
   delete(row_id: number) {
     console.log("delete clicked for row id: ", row_id);
   }

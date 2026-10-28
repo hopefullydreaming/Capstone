@@ -123,6 +123,37 @@ data: string;
 
 
 
+export type CharacterPayload = {
+  row_id?: number;
+  user_row_id?: number;
+  name: string;
+  level: number;
+  class_row_id: number;
+  subclass_row_id?: number;
+  species_row_id: number;
+  subspecies_row_id?: number;
+
+  background_row_id?: number;
+
+  strength: number;
+  dexterity: number;
+  constitution: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
+
+data: string;
+
+
+}
+
+
+
+
+
+
+
+
 
 
 

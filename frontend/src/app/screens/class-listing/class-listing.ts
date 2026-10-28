@@ -27,7 +27,7 @@ export class ClassListing {
       error: (err) => console.error(err)
     });
 
-    this.classService.getClericSubclasses().subscribe({
+    this.classService.getSubclasses(3).subscribe({
       next: (data: Subclass[]) => {
         this.subclasses.set(data);
         console.log("SUBCLASSES: ", this.subclasses())
@@ -36,7 +36,7 @@ export class ClassListing {
       error: (err) => console.error(err)
     });
 
-    this.classService.getLifeCleric().subscribe({
+    this.classService.getClassFeatures(3,6, 20).subscribe({
       next: (data: ClassFeature[]) => {
         this.classFeatures.set(data);
         console.log("classFeatures: ", this.classFeatures())

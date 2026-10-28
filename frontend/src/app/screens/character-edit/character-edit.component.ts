@@ -1,6 +1,6 @@
 import { Component, signal, inject } from '@angular/core';
 import { DataService } from '../../services/data.service';
-import { CharacterRecord } from "../../models/models";
+import { CharacterRecord, ClassFeature, SpeciesFeature } from "../../models/models";
 import { ActivatedRoute, Router } from '@angular/router'
 import { FloorPipe } from '../../pipes/floor-pipe';
 
@@ -23,7 +23,41 @@ export class CharacterEditComponent {
   character = signal<CharacterRecord | null>(null);
   char: CharacterRecord = null;
 
+  classFeatures = signal<ClassFeature[]>([])
+  speciesFeatures = signal<SpeciesFeature[]>([])
+
   data: any = {};
+
+  skillList = [
+    { id: "acrobatics", label:"Acrobatics" },
+    { id: "animalHandling", label: "Animal Handling" },
+    { id: "arcana", label: "Arcana" },
+    { id: "athletics", label: "Athletics" },
+    { id: "deception", label: "Deception" },
+    { id: "history", label: "History" },
+    { id: "insight", label: "Insight" },
+    { id: "intimidation", label: "Intimidation" },
+    { id: "investigation", label: "Investigation" },
+    { id: "medicine", label: "Medicine" },
+    { id: "nature", label: "Nature" },
+    { id: "perception", label: "Perception" },
+    { id: "performance", label: "Performance" },
+    { id: "persuasion", label: "Persuasion" },
+    { id: "religion", label: "Religion" },
+    { id: "sleightOfHand", label: "Sleight of Hand" },
+    { id: "stealth", label: "Stealth" },
+    { id: "survival", label: "Survival" }
+  ]
+
+
+  abilityList = [
+    { id: "strength", label:"STR" },
+    { id: "dexterity", label: "DEX" },
+    { id: "constitution", label: "CON" },
+    { id: "intelligence", label: "INT" },
+    { id: "wisdom", label: "WIS" },
+    { id: "charisma", label: "CHA" }
+  ]
 
 
   ngOnInit() {
@@ -38,42 +72,80 @@ export class CharacterEditComponent {
         this.char = data;
         this.data = JSON.parse(data.data)
         console.log("CharacterRecord: ", this.character(), this.data)
-
+        this.getFeatures();
       },
       error: (err) => console.error(err)
     });
 
+
   }
 
-  getProf(skill: string): number {
-    if (!this.data.skills) return 0;
-    return this.data.skills[skill] ?? 0;
+  getFeatures() {
+
+    this.dataService.getClassFeatures(this.character().class_row_id, this.character().subclass_row_id, this.character().level).subscribe({
+      next: (data: ClassFeature[]) => {
+        this.classFeatures.set(data);
+      },
+      error: (err) => console.error(err)
+    });
+
+
+    this.dataService.getSpeciesFeatures(this.character().species_row_id, this.character().subspecies_row_id).subscribe({
+      next: (data: SpeciesFeature[]) => {
+        this.speciesFeatures.set(data);
+      },
+      error: (err) => console.error(err)
+    });
+
+
   }
 
-  getProfDisplay(skill: string): string {
-    let prof = this.getProf(skill);
+  displayModifier(ability: string): string {
+    let mod = this.getModifier(ability);
 
-    switch (prof) {
-      case 0.5:
-        return "JoaT"
-      case 1:
-        return "Prof"
-      case 2:
-        return "EXP"
-      default:
-        return ""
+    let pb = Math.floor(this.character().level / 4) + 2;
+
+    let prof = this.getProf(ability);
+
+    return this.formatModifier(mod + Math.floor(pb * prof));
+  }
+
+  formatModifier(modifier: number): string {
+    return `${modifier >= 0 ? "+" : ""}${modifier}`;
+  }
+
+
+
+  getScore(ability: string): number {
+
+    switch (ability) {
+      case "dexterity":
+        return this.character().dexterity;
+      case "wisdom":
+        return this.character().wisdom;
+      case "intelligence":
+        return this.character().intelligence;
+      case "strength":
+        return this.character().strength;
+      case "charisma":
+        return this.character().charisma;
+      case "constitution":
+        return this.character().constitution;
     }
+    return 10;
   }
 
-  getSkill(skill: string): string {
+  getModifier(ability: string): number {
     let score = 0;
-    
-    switch (skill) {
+
+    switch (ability) {
+      case "dexterity":
       case "acrobatics":
       case "sleightOfHand":
       case "stealth":
         score = this.character().dexterity;
         break;
+      case "wisdom":
       case "animalHandling":
       case "insight":
       case "medicine":
@@ -81,6 +153,7 @@ export class CharacterEditComponent {
       case "survival":
         score = this.character().wisdom;
         break;
+      case "intelligence":
       case "arcana":
       case "history":
       case "investigation":
@@ -88,29 +161,98 @@ export class CharacterEditComponent {
       case "religion":
         score = this.character().intelligence;
         break;
+      case "strength":
       case "athletics":
         score = this.character().strength;
         break;
+      case "charisma":
       case "deception":
       case "intimidation":
       case "performance":
       case "persuasion":
         score = this.character().charisma;
         break;
+      case "constitution":
+        score = this.character().constitution;
+        break;
     }
-
-    let pb = Math.floor(this.character().level / 4) + 2;
-    let modifier = Math.floor((score - 10) / 2)
-
-    let skillMod = modifier + Math.floor(pb * this.getProf(skill))
-
-    if (skillMod >= 0) {
-      return "+"+skillMod
-    }
-
-    return `${skillMod}`
-
+    return Math.floor((score - 10) / 2);
   }
+
+  getProf(ability: string): number {
+    let prof = 0;
+
+    if (!!this.data.skills && !!this.data.skills[ability]) {
+      prof = this.data.skills[ability]
+    }
+    else if (!!this.data.saves && this.data.saves[ability]) {
+      prof = this.data.saves[ability]
+    }
+
+    return prof
+  }
+
+  getProfDisplay(skill: string): string {
+    let prof = this.getProf(skill);
+
+    switch (prof) {
+      case 0.5:
+        return "◐"
+      case 1:
+        return "◉"
+      case 2:
+        return "⬤"
+      default:
+        return "◎"
+    }
+  }
+
+  // getSkill(skill: string): string {
+  //   let score = 0;
+    
+  //   switch (skill) {
+  //     case "acrobatics":
+  //     case "sleightOfHand":
+  //     case "stealth":
+  //       score = this.character().dexterity;
+  //       break;
+  //     case "animalHandling":
+  //     case "insight":
+  //     case "medicine":
+  //     case "perception":
+  //     case "survival":
+  //       score = this.character().wisdom;
+  //       break;
+  //     case "arcana":
+  //     case "history":
+  //     case "investigation":
+  //     case "nature":
+  //     case "religion":
+  //       score = this.character().intelligence;
+  //       break;
+  //     case "athletics":
+  //       score = this.character().strength;
+  //       break;
+  //     case "deception":
+  //     case "intimidation":
+  //     case "performance":
+  //     case "persuasion":
+  //       score = this.character().charisma;
+  //       break;
+  //   }
+
+  //   let pb = Math.floor(this.character().level / 4) + 2;
+  //   let modifier = Math.floor((score - 10) / 2)
+
+  //   let skillMod = modifier + Math.floor(pb * this.getProf(skill))
+
+  //   if (skillMod >= 0) {
+  //     return "+"+skillMod
+  //   }
+
+  //   return `${skillMod}`
+
+  // }
 
 
 }
