@@ -66,6 +66,7 @@ export class DataService {
     return this.http.get<Class[]>(`${this.apiUrl}/class`, this.header);
   }
   
+  
 
   getAllSubclasses(): Observable<Subclass[]> {
     return this.http.get<Subclass[]>(`${this.apiUrl}/subclass`, this.header);

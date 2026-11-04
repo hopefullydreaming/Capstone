@@ -3,6 +3,7 @@ import { DataService } from '../../services/data.service';
 import { CharacterRecord, ClassFeature, SpeciesFeature, Resource, CharacterDetail } from "../../models/models";
 import { ActivatedRoute, Router } from '@angular/router'
 import { FloorPipe } from '../../pipes/floor-pipe';
+import { GeneratePdfService } from '../../services/generate-pdf.service'
 
 
 
@@ -17,6 +18,7 @@ export class CharacterEditComponent {
   router = inject(Router);
   route = inject(ActivatedRoute);
   dataService = inject(DataService);
+  pdfService = inject(GeneratePdfService);
 
 
 
@@ -25,8 +27,8 @@ export class CharacterEditComponent {
   character = signal<CharacterDetail | null>(null);
   char: CharacterDetail = null;
 
-  classFeatures = signal<ClassFeature[]>([])
-  speciesFeatures = signal<SpeciesFeature[]>([])
+  // classFeatures = signal<ClassFeature[]>([])
+  // speciesFeatures = signal<SpeciesFeature[]>([])
 
   data: any = {};
 
@@ -77,7 +79,7 @@ export class CharacterEditComponent {
         this.char = data;
         this.data = JSON.parse(data.data);
         console.log("CharacterRecord: ", this.character(), this.data);
-        this.getFeatures();
+        // this.getFeatures();
 
         this.resources = this.data.resources;
         this.senses = this.data.senses;
@@ -111,25 +113,25 @@ export class CharacterEditComponent {
     return 1;
   }
 
-  getFeatures() {
+  // getFeatures() {
 
-    this.dataService.getClassFeatures(this.character().class_row_id, this.character().level, this.character().subclass_row_id).subscribe({
-      next: (data: ClassFeature[]) => {
-        this.classFeatures.set(data);
-      },
-      error: (err) => console.error(err)
-    });
-
-
-    this.dataService.getSpeciesFeatures(this.character().species_row_id, this.character().subspecies_row_id).subscribe({
-      next: (data: SpeciesFeature[]) => {
-        this.speciesFeatures.set(data);
-      },
-      error: (err) => console.error(err)
-    });
+  //   this.dataService.getClassFeatures(this.character().class_row_id, this.character().level, this.character().subclass_row_id).subscribe({
+  //     next: (data: ClassFeature[]) => {
+  //       this.classFeatures.set(data);
+  //     },
+  //     error: (err) => console.error(err)
+  //   });
 
 
-  }
+  //   this.dataService.getSpeciesFeatures(this.character().species_row_id, this.character().subspecies_row_id).subscribe({
+  //     next: (data: SpeciesFeature[]) => {
+  //       this.speciesFeatures.set(data);
+  //     },
+  //     error: (err) => console.error(err)
+  //   });
+
+
+  // }
 
   displayModifier(ability: string): string {
     let mod = this.getModifier(ability);
@@ -145,10 +147,16 @@ export class CharacterEditComponent {
     return `${modifier >= 0 ? "+" : ""}${modifier}`;
   }
 
-  levelUp(row_id: number, level: number) {
+  levelUp(row_id: number) {
     console.log("level up clicked for row id: ", row_id);
 
-    this.router.navigate(['/character', row_id, 'level', level + 1], { replaceUrl: true, state: { level: level + 1 } });
+    this.router.navigate(['/character', row_id, 'level', this.char.level + 1], { replaceUrl: true, state: { level: this.char.level + 1, class_row_id: this.char.class_row_id } });
+  }
+
+  async downloadPdf(row_id: number) {
+    console.log("download clicked for row id: ", row_id);
+
+    // await this.pdfService.generateBooklet();
   }
 
 

@@ -128,23 +128,9 @@ export class CharacterAddComponent {
       error: (err) => console.error(err)
     });
 
-    let classInput = this.form.get("class_row_id");
-    let levelInput = this.form.get("level");
 
-    combineLatest([
-      classInput.valueChanges.pipe(startWith(classInput.value)),
-      levelInput.valueChanges.pipe(startWith(levelInput.value))
-      // classInput.valueChanges, levelInput.valueChanges
-    ]).subscribe(([cls, lvl]) => {
-
-
-      let selectedClass = this.classes().find(c => c.row_id == cls);
-      if (!!selectedClass && selectedClass.subclass_level <= lvl) {
-        this.filteredSubclasses.set(this.subclasses().filter(s => s.class_row_id == cls))
-      }
-      else {
-        this.filteredSubclasses.set([])
-      }
+    this.form.get("class_row_id")?.valueChanges.subscribe(val => {
+      this.filteredSubclasses.set(this.subclasses().filter(s => s.class_row_id == val))
     })
 
     this.form.get("species_row_id")?.valueChanges.subscribe(val => {

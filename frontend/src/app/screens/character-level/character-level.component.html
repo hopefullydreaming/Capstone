@@ -1,6 +1,22 @@
 <p>character-level.component works! LEVEL: {{level}}</p>
 
 
+    @if(choiceArray()){
+<table class="border-collapse border border-purple-300 m-2">
+    <tr class="border border-purple-300">
+        <td class="p-2">Name</td>
+        <td class="p-2">Desc</td>
+    </tr>
+    @for(choice of choiceOptions; track choice.name;){
+    <tr class="border border-purple-300">
+        <td class="p-2">{{ choice.name }}</td>
+        <td class="p-2">{{ choice.desc }}</td>
+    </tr>
+    }
+</table>
+}
+
+
 
 <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
     @if(skillArray()){
@@ -18,6 +34,23 @@
         }
     </div>
     }
+
+    @if(choiceArray()){
+    <div formArrayName="choiceArray" class="flex flex-col gap-4 items-center mt-6">
+        @for (choice of choiceArray().controls; track $index) {
+
+        <!--<div class="flex flex-col gap-1">-->
+        <p-select [options]="choiceOptions" optionLabel="name" optionValue="name" placeholder="Choice" [formControlName]="$index">
+            <ng-template #item let-item>
+                <div [pTooltip]="item.decription">
+                    <p>{{ item.name }}</p>
+                </div>
+            </ng-template>
+        </p-select>
+        }
+    </div>
+    }
+
 
     <button pButton pSize="small" type="submit" class=" w-fit">Level Up</button>
 

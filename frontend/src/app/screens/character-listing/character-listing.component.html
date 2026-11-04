@@ -15,7 +15,10 @@
             <div>{{ char.subspecies_name != null ? char.subspecies_name : char.species_name }}</div>
             <div class="flex flex-row gap-10 text-purple-600 underline cursor-pointer">
                 @if(char.level < 20){
-                <div class="hover:text-purple-800" (click)="levelUp(char.row_id, char.level)">Level Up</div>
+                <div class="hover:text-purple-800" (click)="levelUp(char.row_id, char)">Level Up</div>
+                }
+                @else{
+                <div class="text-purple-400">Max Level</div>
                 }
                 <div class="hover:text-purple-800">Delete</div>
             </div>

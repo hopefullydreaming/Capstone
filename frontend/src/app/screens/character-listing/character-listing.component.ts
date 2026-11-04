@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { DataService } from '../../services/data.service';
 import { Class, Subclass, CharacterListing } from "../../models/models";
 import { Router } from '@angular/router'
+import { CharacterLevelComponent } from '../character-level/character-level.component';
 
 @Component({
   imports: [],
@@ -39,10 +40,10 @@ export class CharacterListingComponent {
     console.log("delete clicked for row id: ", row_id);
   }
 
-  levelUp(row_id: number, level: number) {
+  levelUp(row_id: number, char: any) {
     console.log("level up clicked for row id: ", row_id);
 
-    this.router.navigate(['/character', row_id, 'level', level+1], { replaceUrl: true, state: { level: level+1 } });
+    this.router.navigate(['/character', row_id, 'level', char.level+1], { replaceUrl: true, state: { level: char.level+1, class_row_id: char.class_row_id } });
   }
 
 }

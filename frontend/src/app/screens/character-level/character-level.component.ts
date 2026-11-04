@@ -39,7 +39,9 @@ export class CharacterLevelComponent {
 
   // backgrounds = signal<Background[]>([]);
   // classes = signal<Class[]>([]);
+  // classObj = signal<Class>(null);
   // subclasses = signal<Subclass[]>([]);
+  // subclass_level = signal<number | null>(null);
   // filteredSubclasses = signal<Subclass[]>([]);
   // species = signal<Species[]>([]);
   // subspecies = signal<Subspecies[]>([]);
@@ -52,6 +54,8 @@ export class CharacterLevelComponent {
   classFeatures = signal<ClassFeature[]>([])
   speciesFeatures = signal<SpeciesFeature[]>([])
 
+  choiceOptions: any[] = [];
+  choiceId: string = "";
 
   skillList = [
     { id: "acrobatics", label: "Acrobatics" },
@@ -95,30 +99,43 @@ export class CharacterLevelComponent {
   // };
 
   skillArray = signal<FormArray>(null);
+  choiceArray = signal<FormArray>(null);
 
-  form: FormGroup = this.fb.group({
-    // name: ["", Validators.required],
-    // background_row_id: [null, Validators.required],
-    // class_row_id: [null, Validators.required],
-    // subclass_row_id: [null],
-    // species_row_id: [null, Validators.required],
-    // subspecies_row_id: [null],
-
-
-    // level: [1, [Validators.required, Validators.max(20), Validators.min(1)]],
-
-
-    // strength: [10, [Validators.required, Validators.max(20), Validators.min(1)]],
-    // dexterity: [10, [Validators.required, Validators.max(20), Validators.min(1)]],
-    // constitution: [10, [Validators.required, Validators.max(20), Validators.min(1)]],
-    // intelligence: [10, [Validators.required, Validators.max(20), Validators.min(1)]],
-    // wisdom: [10, [Validators.required, Validators.max(20), Validators.min(1)]],
-    // charisma: [10, [Validators.required, Validators.max(20), Validators.min(1)]]
-  });
+  form: FormGroup = this.fb.group({});
 
   ngOnInit() {
     console.log("\n\nINIT\n\n")
     this.loadData();
+
+
+    // let class_id = history.state.class_row_id
+    // this.dataService.getClasses().subscribe({
+    //   next: (data: Class[]) => {
+    //     this.classes.set(data);
+    //     console.log("CLASSES: ", this.classes())
+
+    //     console.log("class id", class_id, this.classes())
+
+    //     this.classObj.set(this.classes().find(c => c.row_id == class_id));
+
+    //     console.log("class obj", this.classObj())
+    //     this.subclass_level.set(this.classObj().subclass_level)
+
+    //     console.log("subclass lvl", this.subclass_level())
+
+    //   },
+    //   error: (err) => console.error(err)
+    // });
+
+    // this.dataService.getSubclasses(class_id).subscribe({
+    //   next: (data: Subclass[]) => {
+    //     this.subclasses.set(data);
+    //     console.log("SUBCLASSES: ", this.subclasses())
+
+    //   },
+    //   error: (err) => console.error(err)
+    // });
+
 
   }
 
@@ -143,6 +160,8 @@ export class CharacterLevelComponent {
         this.char = data;
         this.data = JSON.parse(data.data);
         console.log("CharacterRecord: ", this.character(), this.data);
+
+
         // this.getFeatures();
 
         // this.resources = this.data.resources;
@@ -150,14 +169,40 @@ export class CharacterLevelComponent {
 
         // if (this.level > 1) {
 
+
+        let features: any = {};
+        let resources: any[] = [];
+        let senses: any[] = [];
+
         this.dataService.getClassFeatures(this.char.class_row_id, this.level, this.char.subclass_row_id).subscribe({
           next: (d: ClassFeature[]) => {
             this.classFeatures.set(d);
+
+            for (let i in d) {
+              try {
+                console.log("DATA: ", d[i].data)
+                let featureData = JSON.parse(d[i].data)
+                console.log("DATA: ", featureData)
+
+                if (!!featureData.choice) {
+                  console.log("ADD CHOICE")
+                  this.addChoice(featureData.choice)
+                }
+
+              }
+              catch (e) {
+                continue;
+              }
+            }
+
+
+
           },
           error: (err) => console.error(err)
         });
 
-        // }
+
+        // if first level, add skill proficiencies
         if (this.level == 1) {
           let classObj = history.state.classObj;
 
@@ -186,6 +231,7 @@ export class CharacterLevelComponent {
           this.skillArray.set(null);
         }
 
+
       },
       error: (err) => console.error(err)
     });
@@ -213,6 +259,28 @@ export class CharacterLevelComponent {
     return stats;
   }
 
+  addChoice(choiceObj: any) {
+
+    this.choiceOptions = choiceObj.options
+    this.choiceId = choiceObj.id;
+
+    let choicesArray = this.fb.array([])
+
+    for (let i = 0; i < choiceObj.number; i++) {
+      choicesArray.push(new FormControl(null, [Validators.required]))
+      console.log("ADD CONTROL")
+    }
+    console.log("choice ARRAY", choicesArray)
+    console.log("choice opts", this.choiceOptions)
+
+    this.form.registerControl("choiceArray", choicesArray)
+
+    this.choiceArray.set(choicesArray);
+
+  }
+
+
+
 
 
 
@@ -233,7 +301,9 @@ export class CharacterLevelComponent {
 
     for (let i in this.classFeatures()) {
       try {
+        console.log("DATA: ", this.classFeatures()[i].data)
         let featureData = JSON.parse(this.classFeatures()[i].data)
+        console.log("DATA: ", featureData)
         if (!!featureData.resource) {
           resources.push(featureData.resource)
         }
@@ -245,6 +315,7 @@ export class CharacterLevelComponent {
         continue;
       }
     }
+
     let skills = this.data.skills
     console.log("SKILLS BEFORE:", this.data.skills)
 
@@ -252,6 +323,17 @@ export class CharacterLevelComponent {
       let values = this.skillArray().getRawValue();
       console.log("SKILLS RAW VALUE", values)
       for (let s in values) skills[values[s].id] = 1;
+
+      console.log("SKILLS AFTER: ", skills)
+    }
+
+    let choices = this.data.choices ?? {}
+    console.log("choices BEFORE:", this.data.choices)
+
+    if (this.choiceArray() != null) {
+      let values = this.choiceArray().getRawValue();
+      console.log("SKILLS RAW VALUE", values)
+      for (let s in values) choices[this.choiceId] = values[s];
 
       console.log("SKILLS AFTER: ", skills)
     }
@@ -269,9 +351,7 @@ export class CharacterLevelComponent {
       maxHp = this.data.hit_dice + conMod
     }
     let payload;
-    // let saves = JSON.parse(classObj.data).saves
 
-    // if (this.level > 1) {
       payload = {
         row_id: this.row_id(),
         stats: stats,
@@ -281,34 +361,13 @@ export class CharacterLevelComponent {
           speed: this.data.speed,
           saves: this.data.saves,
           skills: skills,
+          choices: choices,
           max_hp: maxHp,
           hit_dice: this.data.hit_dice,
           resources: [...this.data.resources, ...resources],
           senses: [...this.data.senses, ...senses],
         })
       }
-    // }
-    // else {
-    //   payload = {
-    //     row_id: this.row_id(),
-    //     stats: stats,
-    //     data: JSON.stringify(
-    //       this.data
-    //       {
-    //       ...features,
-    //       speed: this.data.speed,
-    //       saves: this.data.saves,
-    //       max_hp: maxHp,
-    //       hit_dice: this.data.hit_dice,
-    //       resources: [...resources],
-    //       senses: [...senses],
-    //       }
-
-    //     )
-    //   }
-
-    // }
-
     console.log("PAYLOAD: ", payload)
 
     this.dataService.putCharacterData(payload, this.row_id()).subscribe(() => {
