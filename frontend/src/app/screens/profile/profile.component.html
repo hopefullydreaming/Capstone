@@ -1,2 +1,5 @@
-<p>profile works!</p>
-<p (click)="toCharacters()" class="cursor-pointer hover:text-purple-800 hover:underline w-fit">characters</p>
+<div class="p-4 flex flex-col gap-3">
+    <p class="text-xl">Hello {{auth.userName()}}, Welcome to your profile.</p>
+    <p (click)="toCharacters()" class="cursor-pointer text-purple-600 underline w-fit hover:text-purple-800">View Characters</p>
+    <p (click)="changePassword()" class="cursor-pointer text-purple-600 underline w-fit hover:text-purple-800">Change Password</p>
+</div>

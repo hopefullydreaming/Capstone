@@ -39,8 +39,10 @@ export class CharacterListingComponent {
     console.log("delete clicked for row id: ", row_id);
   }
 
-  levelUp(row_id: number) {
+  levelUp(row_id: number, level: number) {
     console.log("level up clicked for row id: ", row_id);
+
+    this.router.navigate(['/character', row_id, 'level', level+1], { replaceUrl: true, state: { level: level+1 } });
   }
 
 }

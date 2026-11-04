@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   imports: [],
@@ -6,4 +7,8 @@ import { Component } from '@angular/core';
   styleUrl: './dashboard.component.css',
   templateUrl: './dashboard.component.html',
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+  auth = inject(AuthService);
+
+}
+

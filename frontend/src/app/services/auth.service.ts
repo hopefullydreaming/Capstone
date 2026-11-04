@@ -1,29 +1,32 @@
-import { Injectable, signal, inject, computed } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, of, shareReplay } from 'rxjs';
-import { Class, Subclass, ClassFeature, CharacterListing, CharacterRecord } from "../models/models"
-
-// import { AuthService as auth } from '@auth0/auth0-angular';
-// import { environment as env } from '../environments/environment';
+import { Observable, tap, of, shareReplay, BehaviorSubject } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  // private apiUrl = 'http:localhost:3000/attemptlogin';
-  // private apiUrlLogout = 'http:localhost:3000/logout';
+  isLoggedIn$ = new BehaviorSubject<boolean>(false);
+  public isLoggedIn = toSignal(this.isLoggedIn$)
+  
+  userName$ = new BehaviorSubject<string>('');
+  public userName = toSignal(this.userName$)
 
-  public isLoggedIn = computed(() => {
-    return !!localStorage.getItem("id_token")
-  });
+  dataService = inject(DataService);
 
-  // public getLoginState(): boolean {
-  //   return this.isLoggedIn()
-  // }
+  constructor(private http: HttpClient) {
+    let token = localStorage.getItem("id_token")
 
-  // private auth = inject(auth)
+    if (!!token) {
+      this.dataService.getUsername().subscribe(val => {
+        this.userName$.next(val)
+      })
+      this.isLoggedIn$.next(true)
+    }
 
-  constructor(private http: HttpClient) { }
+  }
 
   signup(body: any) {
     console.log("SIGN UP ATTEMPT")
@@ -47,14 +50,20 @@ export class AuthService {
       shareReplay());
   }
 
+
   private setSession(authResult: any) {
-    if(!!authResult.token)
-    localStorage.setItem('id_token', authResult.token);
+    if (!!authResult.token) {
+      console.log("AUTH RESULT: ", authResult)
+      localStorage.setItem('id_token', authResult.token);
+      this.isLoggedIn$.next(true);
+      this.userName$.next(authResult.username);
+    }
   }          
 
 
   logout(body: any): Observable<boolean> {
     localStorage.removeItem("id_token");
+    this.isLoggedIn$.next(false);
     return of(true)
   }
 }

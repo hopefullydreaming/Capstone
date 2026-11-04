@@ -5,6 +5,8 @@ export type Class = {
   name: string;
   description: string;
   subclass_level: number;
+  hit_dice: number;
+  data: string;
   source_row_id: number;
 }
 
@@ -27,6 +29,7 @@ export type ClassFeature = {
   level: number;
   name: string;
   description: string;
+  data: string;
 }
 
 
@@ -56,6 +59,7 @@ export type SpeciesFeature = {
   is_printed: boolean;
   name: string;
   description: string;
+  data: string;
 }
 
 
@@ -117,6 +121,43 @@ data: string;
 }
 
 
+export type CharacterDetail = {
+  row_id: number;
+  name: string;
+  level: number;
+  class_row_id: number;
+  class_name?: string;
+  subclass_row_id?: number;
+  subclass_name?: string;
+  species_row_id: number;
+  species_name?: string;
+  subspecies_row_id?: number;
+  subspecies_name?: string;
+
+  background_row_id?: number;
+  background_name?: string;
+  background_description?: string;
+
+  strength: number;
+  dexterity: number;
+  constitution: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
+  data: string;
+
+  species_features: SpeciesFeature[];
+  class_features: ClassFeature[];
+
+
+}
+
+
+export type Resource = {
+  name: string;
+  max: number;
+  recharge: string;
+}
 
 
 

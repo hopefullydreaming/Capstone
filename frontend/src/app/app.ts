@@ -26,6 +26,10 @@ export class App {
     this.router.navigate(['/profile']);
   }
 
+  login(){
+    this.router.navigate(['/login']);
+  }
+
   signup(){
     this.router.navigate(['/signup']);
   }

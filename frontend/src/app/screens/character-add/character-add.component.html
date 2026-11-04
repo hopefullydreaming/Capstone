@@ -94,24 +94,48 @@
         <div class="flex flex-row gap-2">
             <div class="flex flex-col gap-1">
                 <label for="class_row_id">Class</label>
-                <p-select [options]="classes()" optionLabel="name" optionValue="row_id" placeholder="Select a Class" formControlName="class_row_id" />
+                <p-select [options]="classes()" optionLabel="name" optionValue="row_id" placeholder="Select a Class" formControlName="class_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription" [tooltipOptions]="tooltipOptions">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
             </div>
-            @if(form.get("level").value >= 3){
+            @if(filteredSubclasses().length > 0){
             <div class="flex flex-col gap-1">
                 <label for="subclass_row_id">Subclass</label>
-                <p-select [options]="filteredSubclasses()" optionLabel="name" optionValue="row_id" placeholder="Select a Subclass" formControlName="subclass_row_id" />
+                <p-select [options]="filteredSubclasses()" optionLabel="name" optionValue="row_id" placeholder="Select a Subclass" formControlName="subclass_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
             </div>
             }
             <div class="flex flex-col gap-1">
                 <label for="species_row_id">Species</label>
-                <p-select [options]="species()" optionLabel="name" optionValue="row_id" placeholder="Select a Species"  formControlName="species_row_id" />
+                <p-select [options]="species()" optionLabel="name" optionValue="row_id" placeholder="Select a Species" formControlName="species_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
             </div>
-
+            @if(filteredSubspecies().length > 0){
             <div class="flex flex-col gap-1">
                 <label for="subspecies_row_id">Subspecies</label>
-                <p-select [options]="filteredSubspecies()" optionLabel="name" optionValue="row_id" placeholder="Select a Subspecies" formControlName="subspecies_row_id" />
+                <p-select [options]="filteredSubspecies()" optionLabel="name" optionValue="row_id" placeholder="Select a Subspecies" formControlName="subspecies_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
             </div>
-
+            }
         </div>
 
 

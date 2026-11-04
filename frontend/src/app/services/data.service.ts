@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Class, Subclass, Species, Subspecies, ClassFeature, SpeciesFeature,
-  CharacterListing, CharacterRecord, Background, CharacterPayload
+  CharacterListing, CharacterRecord, Background, CharacterPayload, CharacterDetail
 } from "../models/models"
 
 @Injectable({
@@ -35,8 +35,22 @@ export class DataService {
   }
 
 
+  getUsername() {
+    return this.http.get<string>(`${this.apiUrl}/username`, this.header);
+  }
+
+  
+
+
   postCharacter(payload: CharacterPayload) {
     return this.http.post<CharacterPayload>(`${this.apiUrl}/character`, payload, this.header);
+  }
+
+  
+
+
+  putCharacterData(data: any, row_id: number) {
+    return this.http.put<any>(`${this.apiUrl}/character/data/${row_id}`, data, this.header);
   }
 
   
@@ -72,11 +86,16 @@ export class DataService {
   }
 
 
-  getClassFeatures(class_row_id: number, subclass_row_id: number, level: number): Observable<ClassFeature[]> {
+  getClassFeatures(class_row_id: number, level: number, subclass_row_id?: number): Observable<ClassFeature[]> {
     return this.http.get<ClassFeature[]>(`${this.apiUrl}/class_features/${class_row_id}/${subclass_row_id}/${level}`, this.header);
   }
 
-  getSpeciesFeatures(species_row_id: number, subspecies_row_id: number): Observable<SpeciesFeature[]> {
+
+  getLevelOneClassFeatures(class_row_id: number, subclass_row_id?: number): Observable<ClassFeature[]> {
+    return this.http.get<ClassFeature[]>(`${this.apiUrl}/class_features/${class_row_id}/${subclass_row_id}`, this.header);
+  }
+
+  getSpeciesFeatures(species_row_id: number, subspecies_row_id?: number): Observable<SpeciesFeature[]> {
     return this.http.get<SpeciesFeature[]>(`${this.apiUrl}/species_features/${species_row_id}/${subspecies_row_id}`, this.header);
   }
 
@@ -84,7 +103,7 @@ export class DataService {
   getCharacterListing(): Observable<CharacterListing[]> {
     return this.http.get<CharacterListing[]>(`${this.apiUrl}/character`, this.header);
   }
-  getCharacterRecord(row_id: number): Observable<CharacterRecord> {
-    return this.http.get<CharacterRecord>(`${this.apiUrl}/character/${row_id}`, this.header);
+  getCharacterRecord(row_id: number): Observable<CharacterDetail> {
+    return this.http.get<CharacterDetail>(`${this.apiUrl}/character/${row_id}`, this.header);
   }
 }

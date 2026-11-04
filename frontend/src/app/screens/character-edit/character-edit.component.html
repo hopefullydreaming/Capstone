@@ -1,16 +1,26 @@
 <div class="p-4">
 
     @if(character()){
-    <p class="text-xl">{{character().name}}</p>
-    <p>{{character().background_name}} {{character().subspecies_name ?? character().species_name}}</p>
-    <p>Level {{character().level}} {{character().subclass_name}} {{character().class_name}}</p>
 
+    <div class="flex flex-row">
+    <div class="flex flex-col">
+        <p class="text-xl">{{character().name}}</p>
+        <p>{{character().background_name}} {{character().subspecies_name ?? character().species_name}}</p>
+        <p>Level {{character().level}} {{character().subclass_name}} {{character().class_name}}</p>
 
-    <table class="border border-collapse border-purple-300" style="width: 540px;">
+    </div>
+        
+    <div class="flex flex-col">
+        <div class="hover:text-purple-800" (click)="levelUp(character().row_id, character().level)">Level Up</div>
+
+    </div>
+
+    </div>
+    <table class="border-b border-2 border-collapse border-purple-300 table-fixed" style="width: 504px;">
         <!--ability scores-->
         <tr>
             @for(ability of abilityList; track ability.id;){
-            <td class="p-2 border border-purple-300 text-center">
+            <td class="p-1 border border-purple-300 text-center">
                 <div class="flex flex-col align-center">
                     <p>{{ ability.label }}</p>
                     <p class="text-2xl">{{ formatModifier(getModifier(ability.id)) }}</p>
@@ -20,101 +30,229 @@
             }
         </tr>
 
-            <tr>
-                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("strength") }} Save: {{ displayModifier("strength") }}</td>
-                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("dexterity") }} Save: {{ displayModifier("dexterity") }}</td>
-                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("constitution") }} Save: {{ displayModifier("constitution") }}</td>
-                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("intelligence") }} Save: {{ displayModifier("intelligence") }}</td>
-                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("wisdom") }} Save: {{ displayModifier("wisdom") }}</td>
-                <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("charisma") }} Save: {{ displayModifier("charisma") }}</td>
-            </tr>
+        <tr>
+
+            @for(ability of abilityList; track ability.id;){
+            <td class="p-1 border border-purple-300 text-center text-xs">{{ getProfDisplay(ability.id) }} Save: {{ displayModifier(ability.id) }}</td>
+            }
+            <!--<td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("strength") }} Save: {{ displayModifier("strength") }}</td>
+            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("dexterity") }} Save: {{ displayModifier("dexterity") }}</td>
+            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("constitution") }} Save: {{ displayModifier("constitution") }}</td>
+            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("intelligence") }} Save: {{ displayModifier("intelligence") }}</td>
+            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("wisdom") }} Save: {{ displayModifier("wisdom") }}</td>
+            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("charisma") }} Save: {{ displayModifier("charisma") }}</td>-->
+        </tr>
     </table>
 
     <div class="flex flex-row">
         <!--skills-->
-        <table class="border border-collapse border-purple-300" style="width: 180px;">
-            <thead>
-                <tr>
-                    <td class="p-1 border border-purple-300 text-center" colspan="3">Skills</td>
-                </tr>
-            </thead>
-            <tbody>
-                @for(skill of skillList; track skill.id;){
-                <tr class="border border-purple-300">
-                    <td class="p-1 text-center">{{ getProfDisplay(skill.id) }}</td>
-                    <td class="p-1 text-center">{{ displayModifier(skill.id) }}</td>
-                    <td class="p-1">{{ skill.label }}</td>
-                </tr>
-                }
-            </tbody>
+        <table class="border border-collapse border-purple-300 table-auto border-l-2 border-b-2" style="width: 169px;">
+
+            <colgroup>
+                <col style="width: 24px">
+                <col style="width: 24px">
+                <col style="">
+                <col style="width: 43px">
+            </colgroup>
+            <!--<thead>-->
+            <tr>
+                <td class="p-0.5 text-center border-x border-purple-300" colspan="4">Skills</td>
+            </tr>
+            <!--</thead>
+    <tbody>-->
+            @for(skill of skillList; track skill.id;){
+            <tr class="border border-purple-300">
+                <td class="p-0.5 content-center text-center">{{ getProfDisplay(skill.id) }}</td>
+                <td class=" content-center text-center">{{ displayModifier(skill.id) }}</td>
+                <td class="p-1 text-xs content-center leading-[0.625rem]" colspan="2"><p>{{ skill.label }}</p></td>
+            </tr>
+            }
+            <tr>
+        <td class="p-0.5 text-center border-x border-purple-300 border-t-2" colspan="4">Senses</td>
+    </tr>
+            <!--</thead>
+    <tbody>-->
+            <tr class="border border-purple-300">
+                <td class="p-1 text-xs content-center leading-[0.625rem]" colspan="3">Passive Perception</td>
+                <td class="p-0.5 content-center text-center">{{ getModifier("perception") + 10 }}</td>
+            </tr>
+            <tr class="border border-purple-300">
+                <td class="p-1 text-xs content-center leading-[0.625rem]" colspan="3">Passive Insight</td>
+                <td class="p-0.5 content-center text-center">{{ getModifier("insight") + 10 }}</td>
+            </tr>
+            <tr class="border border-purple-300">
+                <td class="p-1 text-xs content-center leading-[0.625rem]" colspan="3">Passive Investigation</td>
+                <td class="p-0.5 content-center text-center">{{ getModifier("investigation") + 10 }}</td>
+            </tr>
+            @for(sense of senses; track sense.name;){
+            <tr class="border border-purple-300">
+                <td class="p-1 text-xs content-center leading-[0.625rem]" colspan="3">{{ sense.name }}</td>
+                <td class="p-0.5 content-center text-center">{{ sense.value }}</td>
+            </tr>
+            }
+            <!--</tbody>-->
         </table>
         <div class="flex flex-col">
             <!--comabat info-->
-            <table class="border border-collapse border-purple-300 justify-self-start table-fixed  align-top" style="width: 360px;">
+            <table class="border border-collapse border-purple-300 justify-self-start table-fixed align-top border-b-2 border-r-2" style="width: 335px;">
                 <tbody>
                     <tr class="border border-purple-300">
                         <td class="p-1 text-center border-x border-purple-300" colspan="2">
                             <div class="flex flex-col align-center">
-                                <p>AC</p>
-                                <p class="text-2xl">15</p>
+                                <p class="text-xs leading-[0.82rem]">AC</p>
+                                <p class="text-4xl">{{ 10 + getModifier("dex") }}</p>
                             </div>
                         </td>
                         <td class="p-1 text-center border-x border-purple-300" colspan="2">
                             <div class="flex flex-col align-center">
-                                <p>Initative</p>
-                                <p class="text-2xl">+3</p>
+                                <p class="text-xs leading-[0.82rem]">Initative</p>
+                                <p class="text-4xl">{{ formatModifier(getModifier("dex")) }}</p>
                             </div>
                         </td>
                         <td class="p-1 text-center border-x border-purple-300" colspan="2">
                             <div class="flex flex-col align-center">
-                                <p>Speed</p>
-                                <p class="text-2xl">30</p>
+                                <p class="text-xs leading-[0.82rem]">Speed</p>
+                                <p class="text-4xl">{{ data.speed?.walking ?? "?" }}</p>
                             </div>
                         </td>
                         <td class="p-1 text-center border-x border-purple-300" colspan="6">
                             <div class="flex flex-col align-center">
-                                <p>Current HP</p>
-                                <p class="text-2xl text-gray-500">26</p>
+                                <p class="text-xs leading-[0.82rem]">Current HP</p>
+                                <p class="text-4xl text-gray-300">{{ data.max_hp ?? "?" }}</p>
                             </div>
                         </td>
                     </tr>
 
                     <tr class="border border-purple-300">
                         <td class="p-1 text-center border-x border-purple-300" colspan="3">
-                            <div class="flex flex-col align-center">
-                                <p>Hit Dice</p>
-                                <p class="text-2xl"><span class="text-gray-500">6</span>d10</p>
+                            <div class="flex flex-col self-center align-top">
+                                <p class="text-xs">Hit Dice</p>
+                                <p class="text-xl leading-6.5"><span class="text-gray-300">{{ character().level }}</span>d{{ data.hit_dice ?? "?" }}</p>
+                                <p class="text-[0.625rem] leading-[0.625rem]">Max: {{ character().level }}d{{ data.hit_dice ?? "?" }}</p>
                             </div>
                         </td>
                         <td class="p-1 text-center border-x border-purple-300" colspan="3">
-                            <div class="flex flex-col align-center">
-                                <p>Max HP</p>
-                                <p class="text-2xl">26</p>
+                            <div class="flex flex-col self-center align-top">
+                                <p class="text-xs leading-[0.82rem]">Max HP</p>
+                                <p class="text-4xl">{{ data.max_hp ?? "?" }}</p>
                             </div>
                         </td>
-                        <td class="p-1 text-center border-x border-purple-300 align-top" colspan="2">
-                            <div class="flex flex-col justify-self-start">
-                                <p class="text-xs justify-self-start">Temp HP</p>
+                        <td class="py-1 text-center border-x border-purple-300" colspan="2">
+                            <div class="flex flex-col">
+                                <p class="text-xs">Temp HP</p>
                             </div>
                         </td>
-                        <td class="p-1 text-center border-x border-purple-300 " colspan="4">
-                            <div class="flex flex-col ">
-                                <p>Death Saves</p>
-                                <p>Pass: ◎ ◎ ◎</p>
-                                <p>Fail: ◎ ◎ ◎</p>
+                        <td class="p-1 text-center border-x border-purple-300" colspan="4">
+                            <div class="flex flex-col">
+                                <p class="text-xs">Death Saves</p>
+                                <div class="grid grid-cols-2 text-sm leading-4.5">
+                                    <p>Pass:</p>
+                                    <p>◎ ◎ ◎</p>
+                                    <p>Fail:</p>
+                                    <p>◎ ◎ ◎</p>
+                                </div>
+
                             </div>
                         </td>
                     </tr>
 
-                    <tr class="border border-purple-300">
-                        <td class="p-1 text-center border-x border-purple-300" colspan="12">Resources</td>
+                    <tr class="border border-purple-300 border-t-2">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12">Resources</td>
                     </tr>
 
                     <tr class="border border-purple-300">
-                        <td class="p-1 text-center border-x border-purple-300" colspan="5">Name</td>
-                        <td class="p-1 text-center border-x border-purple-300" colspan="2">Cur</td>
-                        <td class="p-1 text-center border-x border-purple-300" colspan="2">Max</td>
-                        <td class="p-1 text-center border-x border-purple-300" colspan="3">Recharge</td>
+                        <td class="py-0.5 px-1.5 border-x border-purple-300" colspan="7">Name</td>
+                        <td class="py-0.5 text-center border-x border-purple-300" colspan="2">Uses</td>
+                        <td class="py-0.5 text-center border-x border-purple-300" colspan="3">Recharge</td>
+                    </tr>
+                    @for(resource of resources; track resource.name;){
+                    <tr class="border border-purple-300">
+                        <td class="py-1 px-1.5 text-xs border-x border-purple-300 leading-[0.625rem] content-center" colspan="7">{{ resource.name }}</td>
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="2">
+                            @if(getResourceMax(resource.max) > 0){
+                            <span class="text-gray-300">{{ getResourceMax(resource.max) }}</span>&nbsp;&nbsp;/&nbsp;&nbsp;{{ getResourceMax(resource.max) }}
+                            }
+                            @else {
+
+                            &infin;
+                            }
+                        </td>
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="3">{{ resource.recharge }}</td>
+                    </tr>
+                    }
+
+
+                    <!--@for(resource of resources; track resource.name;){
+    <tr class="border border-purple-300">
+        <td class="py-1 px-1.5 text-xs border-x border-purple-300 leading-[0.625rem] content-center" colspan="7">{{ resource.name }}</td>
+        <td class="p-0.5 text-center border-x border-purple-300" colspan="2"><span class="text-gray-300">{{ getResourceMax(resource.max) }}</span>&nbsp;&nbsp;/&nbsp;&nbsp;{{ getResourceMax(resource.max) }}</td>
+        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+    </tr>
+    }-->
+
+                    <tr class="border border-purple-300 border-t-2">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12">Equipment</td>
+                    </tr>
+
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <!--<tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>-->
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    </tr>
+
+                    <tr class="border border-purple-300 h-[24.8px]">
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
                     </tr>
 
                 </tbody>
@@ -123,7 +261,40 @@
 
     </div>
 
-    <p>data: {{character().data}}</p>
+    <!--<div class="flex flex-row">-->
+        <!--skills-->
+        <!--<table class="border border-collapse border-purple-300 border-t-0" style="width: 169px;">-->
+            <!--<thead>-->
+                <!--<tr>
+                    <td class="p-0.5 text-center border-x border-purple-300" colspan="2">Senses</td>
+                </tr>-->
+            <!--</thead>
+            <tbody>-->
+                <!--<tr class="border border-purple-300">
+                    <td class="p-1 text-xs content-center leading-[0.625rem]">Passive Perception</td>
+                    <td class="p-0.5 content-center text-center">{{ getModifier("perception") + 10 }}</td>
+                </tr>
+                <tr class="border border-purple-300">
+                    <td class="p-1 text-xs content-center leading-[0.625rem]">Passive Insight</td>
+                    <td class="p-0.5 content-center text-center">{{ getModifier("insight") + 10 }}</td>
+                </tr>
+                <tr class="border border-purple-300">
+                    <td class="p-1 text-xs content-center leading-[0.625rem]">Passive Investigation</td>
+                    <td class="p-0.5 content-center text-center">{{ getModifier("investigation") + 10 }}</td>
+                </tr>
+                @for(sense of senses; track sense.name;){
+                <tr class="border border-purple-300">
+                    <td class="p-1 text-xs content-center leading-[0.625rem]">{{ sense.name }}</td>
+                    <td class="p-0.5 content-center text-center">{{ sense.value }}</td>                    
+                </tr>
+                }-->
+            <!--</tbody>-->
+        <!--</table>
+
+    </div>-->
+
+
+    <p class="pt-5">data: {{character().data}}</p>
 
     <p>FEATURES</p>
 
@@ -136,7 +307,7 @@
             <th class="p-2">IsPrinted</th>
         </tr>
 
-        @for(feature of speciesFeatures(); track feature.row_id;){
+        @for(feature of character().species_features; track feature.row_id;){
         <tr class="border border-purple-300">
             <!--<td class="p-2">{{feature.species_name}}</td>
             <td class="p-2">{{feature.subspecies_name}}</td>-->
@@ -162,7 +333,7 @@
             <th class="p-2">Description</th>
         </tr>
 
-        @for(feature of classFeatures(); track feature.row_id;){
+        @for(feature of character().class_features; track feature.row_id;){
         <tr class="border border-purple-300">
             <td class="p-2">{{feature.class_name}}</td>
             <td class="p-2">{{feature.subclass_name}}</td>

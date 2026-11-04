@@ -17,6 +17,9 @@ import { CharacterEditComponent } from './screens/character-edit/character-edit.
 import { LoginComponent } from './screens/login/login.component';
 import { SignUpComponent } from './screens/sign-up/sign-up.component';
 import { CharacterAddComponent } from './screens/character-add/character-add.component';
+import { AuthGuard } from './services/auth-guard';
+import { LoginGuard } from './services/login-guard';
+import { CharacterLevelComponent } from './screens/character-level/character-level.component';
 
 
 export const routes: Routes = [
@@ -30,15 +33,18 @@ export const routes: Routes = [
   // routes
   {
     path:"signup",
-    component: SignUpComponent
+    component: SignUpComponent,
+    canActivate: [LoginGuard]
   },
   {
     path:"login",
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [LoginGuard]
   },
   {
     path:"dashboard",
-    component: DashboardComponent
+    component: DashboardComponent,
+    canActivate: [AuthGuard]
   },
   {
     path:"error",
@@ -47,21 +53,31 @@ export const routes: Routes = [
   {
     path:"profile",
     component: ProfileComponent,
+    canActivate: [AuthGuard]
   },
 
   {
     path:"characters",
-    component: CharacterListingComponent
+    component: CharacterListingComponent,
+    canActivate: [AuthGuard]
   },
 
   {
     path:"character/new",
-    component: CharacterAddComponent
+    component: CharacterAddComponent,
+    canActivate: [AuthGuard]
   },
 
   {
     path:"character/:row_id",
-    component: CharacterEditComponent
+    component: CharacterEditComponent,
+    canActivate: [AuthGuard]
+  },
+
+  {
+    path:"character/:row_id/level/:level",
+    component: CharacterLevelComponent,
+    canActivate: [AuthGuard]
   },
 
   // redirects 

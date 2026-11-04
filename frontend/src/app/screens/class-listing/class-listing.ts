@@ -36,7 +36,7 @@ export class ClassListing {
       error: (err) => console.error(err)
     });
 
-    this.classService.getClassFeatures(3,6, 20).subscribe({
+    this.classService.getClassFeatures(3,20,6).subscribe({
       next: (data: ClassFeature[]) => {
         this.classFeatures.set(data);
         console.log("classFeatures: ", this.classFeatures())

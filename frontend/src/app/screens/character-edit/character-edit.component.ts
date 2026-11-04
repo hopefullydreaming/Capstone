@@ -1,8 +1,10 @@
 import { Component, signal, inject } from '@angular/core';
 import { DataService } from '../../services/data.service';
-import { CharacterRecord, ClassFeature, SpeciesFeature } from "../../models/models";
+import { CharacterRecord, ClassFeature, SpeciesFeature, Resource, CharacterDetail } from "../../models/models";
 import { ActivatedRoute, Router } from '@angular/router'
 import { FloorPipe } from '../../pipes/floor-pipe';
+
+
 
 @Component({
   imports: [FloorPipe],
@@ -20,13 +22,16 @@ export class CharacterEditComponent {
 
 
   row_id = signal<number | null>(null);
-  character = signal<CharacterRecord | null>(null);
-  char: CharacterRecord = null;
+  character = signal<CharacterDetail | null>(null);
+  char: CharacterDetail = null;
 
   classFeatures = signal<ClassFeature[]>([])
   speciesFeatures = signal<SpeciesFeature[]>([])
 
   data: any = {};
+
+  resources: Resource[] = []
+  senses: any[] = []
 
   skillList = [
     { id: "acrobatics", label:"Acrobatics" },
@@ -67,12 +72,15 @@ export class CharacterEditComponent {
     });
 
     this.dataService.getCharacterRecord(this.row_id()).subscribe({
-      next: (data: CharacterRecord) => {
+      next: (data: CharacterDetail) => {
         this.character.set(data);
         this.char = data;
-        this.data = JSON.parse(data.data)
-        console.log("CharacterRecord: ", this.character(), this.data)
+        this.data = JSON.parse(data.data);
+        console.log("CharacterRecord: ", this.character(), this.data);
         this.getFeatures();
+
+        this.resources = this.data.resources;
+        this.senses = this.data.senses;
       },
       error: (err) => console.error(err)
     });
@@ -80,9 +88,32 @@ export class CharacterEditComponent {
 
   }
 
+
+  getResourceMax(data: any): number {
+    if (data.table) {
+      return data.table[this.character().level - 1]
+    }
+    if (data.stat) {
+      let mod = this.getModifier(data.stat);
+      return mod > 0 ? mod : 1
+    }
+    if (data.statplus) {
+      let mod = this.getModifier(data.stat) + data.plus;
+      return mod > 0 ? mod : 1
+    }
+    if (data.number) {
+      return data.number
+    }
+    if (data.level) {
+      return this.character().level * data.level
+    }
+
+    return 1;
+  }
+
   getFeatures() {
 
-    this.dataService.getClassFeatures(this.character().class_row_id, this.character().subclass_row_id, this.character().level).subscribe({
+    this.dataService.getClassFeatures(this.character().class_row_id, this.character().level, this.character().subclass_row_id).subscribe({
       next: (data: ClassFeature[]) => {
         this.classFeatures.set(data);
       },
@@ -103,7 +134,7 @@ export class CharacterEditComponent {
   displayModifier(ability: string): string {
     let mod = this.getModifier(ability);
 
-    let pb = Math.floor(this.character().level / 4) + 2;
+    let pb = Math.floor((this.character().level -1 )/ 4) + 2;
 
     let prof = this.getProf(ability);
 
@@ -114,6 +145,11 @@ export class CharacterEditComponent {
     return `${modifier >= 0 ? "+" : ""}${modifier}`;
   }
 
+  levelUp(row_id: number, level: number) {
+    console.log("level up clicked for row id: ", row_id);
+
+    this.router.navigate(['/character', row_id, 'level', level + 1], { replaceUrl: true, state: { level: level + 1 } });
+  }
 
 
   getScore(ability: string): number {
@@ -139,12 +175,14 @@ export class CharacterEditComponent {
     let score = 0;
 
     switch (ability) {
+      case "dex":
       case "dexterity":
       case "acrobatics":
       case "sleightOfHand":
       case "stealth":
         score = this.character().dexterity;
         break;
+      case "wis":
       case "wisdom":
       case "animalHandling":
       case "insight":
@@ -153,6 +191,7 @@ export class CharacterEditComponent {
       case "survival":
         score = this.character().wisdom;
         break;
+      case "int":
       case "intelligence":
       case "arcana":
       case "history":
@@ -161,10 +200,12 @@ export class CharacterEditComponent {
       case "religion":
         score = this.character().intelligence;
         break;
+      case "str":
       case "strength":
       case "athletics":
         score = this.character().strength;
         break;
+      case "cha":
       case "charisma":
       case "deception":
       case "intimidation":
@@ -172,6 +213,7 @@ export class CharacterEditComponent {
       case "persuasion":
         score = this.character().charisma;
         break;
+      case "con":
       case "constitution":
         score = this.character().constitution;
         break;
@@ -206,53 +248,5 @@ export class CharacterEditComponent {
         return "◎"
     }
   }
-
-  // getSkill(skill: string): string {
-  //   let score = 0;
-    
-  //   switch (skill) {
-  //     case "acrobatics":
-  //     case "sleightOfHand":
-  //     case "stealth":
-  //       score = this.character().dexterity;
-  //       break;
-  //     case "animalHandling":
-  //     case "insight":
-  //     case "medicine":
-  //     case "perception":
-  //     case "survival":
-  //       score = this.character().wisdom;
-  //       break;
-  //     case "arcana":
-  //     case "history":
-  //     case "investigation":
-  //     case "nature":
-  //     case "religion":
-  //       score = this.character().intelligence;
-  //       break;
-  //     case "athletics":
-  //       score = this.character().strength;
-  //       break;
-  //     case "deception":
-  //     case "intimidation":
-  //     case "performance":
-  //     case "persuasion":
-  //       score = this.character().charisma;
-  //       break;
-  //   }
-
-  //   let pb = Math.floor(this.character().level / 4) + 2;
-  //   let modifier = Math.floor((score - 10) / 2)
-
-  //   let skillMod = modifier + Math.floor(pb * this.getProf(skill))
-
-  //   if (skillMod >= 0) {
-  //     return "+"+skillMod
-  //   }
-
-  //   return `${skillMod}`
-
-  // }
-
 
 }
