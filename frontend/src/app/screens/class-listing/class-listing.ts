@@ -1,7 +1,7 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Classes } from '../../services/classes';
-
+import { DataService } from '../../services/data.service';
+import { Class, Subclass, ClassFeature } from "../../models/models";
 
 @Component({
   imports: [CommonModule],
@@ -10,15 +10,36 @@ import { Classes } from '../../services/classes';
   templateUrl: './class-listing.html',
 })
 export class ClassListing {
-classes= signal<any[]>([]);
+  classes= signal<Class[]>([]);
+  subclasses= signal<Subclass[]>([]);
+  classFeatures= signal<ClassFeature[]>([]);
 
-  constructor(private userService: Classes) {}
+
+  constructor(private classService: DataService) {}
 
   ngOnInit() {
-    this.userService.getClasses().subscribe({
-      next: (data) => {
+    this.classService.getClasses().subscribe({
+      next: (data: Class[]) => {
         this.classes.set(data);
         console.log("CLASSES: ", this.classes())
+
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.classService.getSubclasses(3).subscribe({
+      next: (data: Subclass[]) => {
+        this.subclasses.set(data);
+        console.log("SUBCLASSES: ", this.subclasses())
+
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.classService.getClassFeatures(3,20,6).subscribe({
+      next: (data: ClassFeature[]) => {
+        this.classFeatures.set(data);
+        console.log("classFeatures: ", this.classFeatures())
 
       },
       error: (err) => console.error(err)

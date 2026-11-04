@@ -1,0 +1,25 @@
+<div class="p-4">
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
+        <div class="flex flex-col gap-1">
+            <label for="email">Email:</label>
+            <input pInputText pSize="small"
+                   class="w-full sm:w-96" id="email"
+                   placeholder="Enter your email"
+                   formControlName="email"
+                   required />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="password">Password:</label>
+            <input type="text" pInputText pSize="small"
+                   class="w-full sm:w-96" id="password"
+                   placeholder="Enter your password"
+                   formControlName="password"
+                   required />
+        </div>
+        <div class="text-red-400">{{ errorMsg() }}</div>
+            <button pButton pSize="small" type="submit" class=" w-fit">Login</button>
+
+    </form>
+
+</div>

@@ -1,0 +1,147 @@
+<div class="p-4">
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
+
+
+
+
+        <div class="flex flex-row gap-2">
+
+            <div class="flex flex-col gap-1">
+                <label for="name">Name:</label>
+                <input type="text" pInputText 
+                       class="w-full sm:w-96" id="name"
+                       formControlName="name"
+                       required />
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="background_row_id">Background</label>
+                <p-select [options]="backgrounds()" optionLabel="name" optionValue="row_id"  pSize="small"
+                          placeholder="Select a Background" formControlName="background_row_id" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="level">Level:</label>
+                <p-inputnumber [showButtons]="true"
+                               inputStyleClass="w-16"
+                               id="level" [min]="1" [max]="20"
+                               formControlName="level"
+                               required>
+                </p-inputnumber>
+            </div>
+        </div>
+
+
+        <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-1">
+                <label for="strength">STR:</label>
+                <p-inputnumber pInputNumber pSize="small" [showButtons]="true"
+                               inputStyleClass="w-16" id="strength" [min]="1" [max]="20"
+                               formControlName="strength"
+                               required>
+                </p-inputnumber>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="dexterity">DEX:</label>
+                <p-inputnumber pInputNumber pSize="small" [showButtons]="true"
+                               inputStyleClass="w-16" id="dexterity" [min]="1" [max]="20"
+                               formControlName="dexterity"
+                               required>
+                </p-inputnumber>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="constitution">CON:</label>
+                <p-inputnumber pInputNumber pSize="small" [showButtons]="true"
+                               inputStyleClass="w-16" id="constitution" [min]="1" [max]="20"
+                               formControlName="constitution"
+                               required>
+                </p-inputnumber>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="intelligence">INT:</label>
+                <p-inputnumber pInputNumber pSize="small" [showButtons]="true"
+                               inputStyleClass="w-16" id="intelligence" [min]="1" [max]="20"
+                               formControlName="intelligence"
+                               required>
+                </p-inputnumber>
+            </div>
+
+
+
+            <div class="flex flex-col gap-1">
+                <label for="wisdom">WIS:</label>
+                <p-inputnumber pInputNumber pSize="small" [showButtons]="true"
+                               inputStyleClass="w-16" id="wisdom" [min]="1" [max]="20"
+                               formControlName="wisdom"
+                               required>
+                </p-inputnumber>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="charisma">CHA:</label>
+                <p-inputnumber pInputNumber pSize="small" [showButtons]="true"
+                               inputStyleClass="w-16" id="charisma" [min]="1" [max]="20"
+                               formControlName="charisma"
+                               required>
+                </p-inputnumber>
+            </div>
+        </div>
+
+        <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-1">
+                <label for="class_row_id">Class</label>
+                <p-select [options]="classes()" optionLabel="name" optionValue="row_id" placeholder="Select a Class" formControlName="class_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription" [tooltipOptions]="tooltipOptions">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+            @if(filteredSubclasses().length > 0){
+            <div class="flex flex-col gap-1">
+                <label for="subclass_row_id">Subclass</label>
+                <p-select [options]="filteredSubclasses()" optionLabel="name" optionValue="row_id" placeholder="Select a Subclass" formControlName="subclass_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+            }
+            <div class="flex flex-col gap-1">
+                <label for="species_row_id">Species</label>
+                <p-select [options]="species()" optionLabel="name" optionValue="row_id" placeholder="Select a Species" formControlName="species_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+            @if(filteredSubspecies().length > 0){
+            <div class="flex flex-col gap-1">
+                <label for="subspecies_row_id">Subspecies</label>
+                <p-select [options]="filteredSubspecies()" optionLabel="name" optionValue="row_id" placeholder="Select a Subspecies" formControlName="subspecies_row_id">
+                    <ng-template #item let-item>
+                        <div [pTooltip]="item.decription">
+                            <p>{{ item.name }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+            }
+        </div>
+
+
+
+        <button pButton pSize="small" type="submit" class=" w-fit">Create</button>
+
+    </form>
+
+</div>

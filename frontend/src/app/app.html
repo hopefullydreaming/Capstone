@@ -1,9 +1,21 @@
-<div class="flex flex-row flex-wrap justify-between gap-2 p-3 bg-purple-200 items-center">
-  <p class="w-fit mb-0 text-2xl">DND Character Builder</p>
-  <div class="flex flex-row gap-3">
-    <p class="w-fit mb-0 text-md">Profile</p>
-    <p class="w-fit mb-0 text-md">Logout</p>
-  </div>
+<div class="bg-white h-full overflow-hidden flex flex-col">
+    <div class="flex flex-row flex-wrap justify-between gap-2 p-3 bg-purple-200 items-center">
+        <div class="flex flex-row gap-2 items-center cursor-pointer" (click)="toDashboard()">
+            <img src="favicon.png" class="size-10" />
+            <p class="w-fit mb-0 text-2xl">DND Character Builder</p>
+        </div>
+        <div class="flex flex-row gap-3 items-center">
+            @if(auth.isLoggedIn()){
+            <p class="w-fit mb-0 text-md cursor-pointer hover:text-purple-800 hover:underline" (click)="toProfile()">Profile</p>
+            <p class="w-fit mb-0 text-md cursor-pointer hover:text-purple-800 hover:underline" (click)="logout()">Logout</p>
+            }
+            @else{
+            <p class="w-fit mb-0 text-md cursor-pointer hover:text-purple-800 hover:underline" (click)="signup()">Sign Up</p>
+            <p class="w-fit mb-0 text-md cursor-pointer hover:text-purple-800 hover:underline" (click)="login()">Login</p>
+            }
+        </div>
+    </div>
+    <div class="bg-white overflow-y-auto flex-grow">
+        <router-outlet></router-outlet>
+    </div>
 </div>
-
-<router-outlet></router-outlet>
