@@ -2,26 +2,26 @@
 
     @if(character()){
 
-    <div class="flex flex-row">
-    <div class="flex flex-col">
-        <p class="text-xl">{{character().name}}</p>
-        <p>{{character().subspecies_name ?? character().species_name}} {{character().background_name}}</p>
-        <p>Level {{character().level}} {{character().subclass_name}} {{character().class_name}}</p>
+    <div class="flex flex-row justify-between">
+        <div class="flex flex-col">
+            <p class="text-xl">{{character().name}}</p>
+            <p>{{character().subspecies_name ?? character().species_name}} {{character().background_name}}</p>
+            <p>Level {{character().level}} {{character().subclass_name}} {{character().class_name}}</p>
 
-    </div>
-        
-    <div class="flex flex-col text-purple-600">
-        @if(char.level < 20){
-        <div class="hover:text-purple-800 underline" (click)="levelUp(character().row_id)">Level Up</div>
-        }
-        @else{
-        <div class="text-purple-400">Max Level</div>
-        }
+        </div>
+
+        <div class="flex flex-col text-purple-600">
+            @if(char.level < 20){
+            <div class="hover:text-purple-800 underline" (click)="levelUp(character().row_id)">Level Up</div>
+            }
+            @else{
+            <div class="text-purple-400">Max Level</div>
+            }
 
 
-        <div class="hover:text-purple-800 underline" (click)="downloadPdf(character().row_id)">Download PDF</div>
+            <div class="hover:text-purple-800 underline" (click)="downloadPdf(character().row_id)">Download PDF</div>
 
-    </div>
+        </div>
 
     </div>
     <table class="border-b border-2 border-collapse border-blue-300 table-fixed" style="width: 504px;">
@@ -39,16 +39,9 @@
         </tr>
 
         <tr>
-
             @for(ability of abilityList; track ability.id;){
             <td class="p-1 border border-blue-300 text-center text-xs">{{ getProfDisplay(ability.id) }} Save: {{ displayModifier(ability.id) }}</td>
             }
-            <!--<td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("strength") }} Save: {{ displayModifier("strength") }}</td>
-            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("dexterity") }} Save: {{ displayModifier("dexterity") }}</td>
-            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("constitution") }} Save: {{ displayModifier("constitution") }}</td>
-            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("intelligence") }} Save: {{ displayModifier("intelligence") }}</td>
-            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("wisdom") }} Save: {{ displayModifier("wisdom") }}</td>
-            <td class="p-2 border border-purple-300 text-center">{{ getProfDisplay("charisma") }} Save: {{ displayModifier("charisma") }}</td>-->
         </tr>
     </table>
 
@@ -62,12 +55,9 @@
                 <col style="">
                 <col style="width: 43px">
             </colgroup>
-            <!--<thead>-->
             <tr>
                 <td class="p-0.5 text-center border-x border-red-300" colspan="4">Skills</td>
             </tr>
-            <!--</thead>
-    <tbody>-->
             @for(skill of skillList; track skill.id;){
             <tr class="border border-red-300">
                 <td class="p-0.5 content-center text-center">{{ getProfDisplay(skill.id) }}</td>
@@ -76,10 +66,8 @@
             </tr>
             }
             <tr>
-        <td class="p-0.5 text-center border-x border-red-300 border-t-2" colspan="4">Senses</td>
-    </tr>
-            <!--</thead>
-    <tbody>-->
+                <td class="p-0.5 text-center border-x border-red-300 border-t-2" colspan="4">Senses</td>
+            </tr>
             <tr class="border border-red-300">
                 <td class="p-1 text-xs content-center leading-[0.625rem]" colspan="3">Passive Perception</td>
                 <td class="p-0.5 content-center text-center">{{ getModifier("perception") + 10 }}</td>
@@ -98,7 +86,6 @@
                 <td class="p-0.5 content-center text-center">{{ sense.value }}</td>
             </tr>
             }
-            <!--</tbody>-->
         </table>
         <div class="flex flex-col">
             <!--comabat info-->
@@ -177,15 +164,18 @@
                     <tr class="border border-purple-300">
                         <td class="py-1 px-1.5 text-xs border-x border-purple-300 leading-[0.625rem] content-center" colspan="7">{{ resource.name }}</td>
                         <td class="p-0.5 text-center border-x border-purple-300" colspan="2">
+
                             @if(getResourceMax(resource.max) > 0){
-                            <span class="text-gray-300">{{ getResourceMax(resource.max) }}</span>&nbsp;&nbsp;/&nbsp;&nbsp;{{ getResourceMax(resource.max) }}
+                            <span [class]="getResourceMax(resource.max) >= 100 ? 'text-[0.65rem]' : ''">
+                                <span class="text-gray-300">{{ getResourceMax(resource.max) }}</span>&nbsp;&nbsp;/&nbsp;&nbsp;{{ getResourceMax(resource.max) }}
+                            </span>
                             }
                             @else {
 
                             &infin;
                             }
                         </td>
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="3">{{ resource.recharge }}</td>
+                        <td class="p-0.5 text-center border-x border-purple-300" colspan="3">{{ resource.recharge === "long" ? "Long Rest" : resource.recharge === "short" ? "Short Rest" : resource.recharge }}</td>
                     </tr>
                     }
 
@@ -195,186 +185,54 @@
                     </tr>
 
 
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
+                    <tr class="border border-purple-300 h-[48.6px]">
+                        <td class="p-0.5 text-center border-x border-purple-300 align-bottom" colspan="3">PP</td>
+                        <td class="p-0.5 text-center border-x border-purple-300 align-bottom" colspan="3">GP</td>
+                        <td class="p-0.5 text-center border-x border-purple-300 align-bottom" colspan="3">SP</td>
+                        <td class="p-0.5 text-center border-x border-purple-300 align-bottom" colspan="3">CP</td>
                     </tr>
 
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
+                    @for(row of rowDisplay; track row.id;){
 
                     <tr class="border border-purple-300 h-[24.8px]">
                         <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
                     </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <!--<tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>-->
-
-                    <!--<tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>-->
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
-
-                    <tr class="border border-purple-300 h-[24.8px]">
-                        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-                    </tr>
+                    }
 
                 </tbody>
             </table>
         </div>
-
     </div>
 
-    <!--<div class="flex flex-row">-->
-        <!--skills-->
-        <!--<table class="border border-collapse border-purple-300 border-t-0" style="width: 169px;">-->
-            <!--<thead>-->
-                <!--<tr>
-                    <td class="p-0.5 text-center border-x border-purple-300" colspan="2">Senses</td>
-                </tr>-->
-            <!--</thead>
-            <tbody>-->
-                <!--<tr class="border border-purple-300">
-                    <td class="p-1 text-xs content-center leading-[0.625rem]">Passive Perception</td>
-                    <td class="p-0.5 content-center text-center">{{ getModifier("perception") + 10 }}</td>
-                </tr>
-                <tr class="border border-purple-300">
-                    <td class="p-1 text-xs content-center leading-[0.625rem]">Passive Insight</td>
-                    <td class="p-0.5 content-center text-center">{{ getModifier("insight") + 10 }}</td>
-                </tr>
-                <tr class="border border-purple-300">
-                    <td class="p-1 text-xs content-center leading-[0.625rem]">Passive Investigation</td>
-                    <td class="p-0.5 content-center text-center">{{ getModifier("investigation") + 10 }}</td>
-                </tr>
-                @for(sense of senses; track sense.name;){
-                <tr class="border border-purple-300">
-                    <td class="p-1 text-xs content-center leading-[0.625rem]">{{ sense.name }}</td>
-                    <td class="p-0.5 content-center text-center">{{ sense.value }}</td>                    
-                </tr>
-                }-->
-            <!--</tbody>-->
-        <!--</table>
 
-    </div>-->
-
-
-    <p class="pt-5">data: {{character().data}}</p>
-
-    <p>FEATURES</p>
-
-    <table class="border-collapse border border-purple-300 m-2">
-        <tr class="text-left">
-            <!--<th class="p-2">Species</th>
-            <th class="p-2">Subspecies</th>-->
-            <th class="p-2">Name</th>
-            <th class="p-2">Description</th>
-            <th class="p-2">IsPrinted</th>
-        </tr>
-
-        @for(feature of character().species_features; track feature.row_id;){
-        <tr class="border border-purple-300">
-            <!--<td class="p-2">{{feature.species_name}}</td>
-            <td class="p-2">{{feature.subspecies_name}}</td>-->
-            <td class="p-2">{{feature.name}}</td>
-            <td class="p-2">{{feature.description}}</td>
-            <td class="p-2">{{feature.is_printed}}</td>
-        </tr>
-
-        }
-        @empty{
+    <table class="border-b border-2 border-collapse border-blue-300 table-fixed" style="width: 504px;">
         <tr>
-            <td colspan="3">NO DATA LOADED</td>
+            <td class="p-1 border border-blue-300">
+                <div class="flex flex-col">
+                    <p class="text-base">Other Proficiencies</p>
+                    <p class="text-sm">lorem ipsum</p>
+                </div>
+            </td>
         </tr>
-        }
     </table>
 
-    <table class="border-collapse border border-purple-300 m-2">
-        <tr class="text-left">
-            <th class="p-2">Class</th>
-            <th class="p-2">Subclass</th>
-            <th class="p-2">Level</th>
-            <th class="p-2">Name</th>
-            <th class="p-2">Description</th>
-            <th class="p-2">Print</th>
-        </tr>
+    <p class="text-3xl pt-5">Features and Traits</p>
 
-        @for(feature of character().class_features; track feature.row_id;){
-        <tr class="border border-purple-300">
-            <td class="p-2">{{feature.class_name}}</td>
-            <td class="p-2">{{feature.subclass_name}}</td>
-            <td class="p-2">{{feature.level}}</td>
-            <td class="p-2">{{feature.name}}</td>
-            <td class="p-2">{{feature.description}}</td>
-            <td class="p-2">{{ getPrinted(feature) }}</td>
-        </tr>
+    @for(feature of character().species_features; track feature.row_id;){
+    @if(feature.is_printed){
+    <p class="font-bold pt-3">{{feature.name}}</p>
+    <p>{{feature.description}}</p>
 
-        }
-        @empty{
-        <tr>
-            <td colspan="3">NO DATA LOADED</td>
-        </tr>
-        }
-    </table>
+    }
+    }
 
+
+    @for(feature of character().class_features; track feature.row_id;){
+    <p class="font-bold pt-3">{{feature.name}}</p>
+    <p>{{getPrinted(feature)}}</p>
+    }
 
 
     }
 
 </div>
-<!--row_id: number;
-name: string;
-level: number;-->
-<!--class_row_id: number;
-class_name?: string;
-subclass_row_id?: number;
-subclass_name?: string;-->
-<!--species_row_id: number;
-species_name?: string;
-subspecies_row_id?: number;
-subspecies_name?: string;-->
-<!--background_row_id?: number;
-background_name?: string;
-background_description?: string;-->
-<!--strength: number;
-dexterity: number;
-constitution: number;
-intelligence: number;
-wisdom: number;
-charisma: number;-->
-<!--data: string;-->

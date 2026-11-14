@@ -27,8 +27,7 @@ export class CharacterEditComponent {
   character = signal<CharacterDetail | null>(null);
   char: CharacterDetail = null;
 
-  // classFeatures = signal<ClassFeature[]>([])
-  // speciesFeatures = signal<SpeciesFeature[]>([])
+  rowDisplay: any[] = [];
 
   data: any = {};
 
@@ -86,6 +85,14 @@ export class CharacterEditComponent {
 
 
         this.senses = this.data.senses;
+
+        let rowNum = 13 + this.senses.length - this.resources.length
+
+        for (let i = 0; i < rowNum; i++) {
+
+          this.rowDisplay.push({ id: i });
+        }
+
       },
       error: (err) => console.error(err)
     });

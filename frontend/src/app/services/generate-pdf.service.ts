@@ -34,6 +34,7 @@ const RED = rgb(0, 0, 0);
 const PURPLE = rgb(0, 0, 0);
 const GRAY = rgb(0.6, 0.6, 0.6);
 const BLACK = rgb(0, 0, 0);
+const WHITE = rgb(1,1,1);
 
 // const BLUE = rgb(0.2, 0.5, 0.8);
 // const RED = rgb(0.8, 0.5, 0.6);
@@ -136,6 +137,8 @@ export class GeneratePdfService {
       const pagesToAdd = 4 - remainder;
       for (let i = 0; i < pagesToAdd; i++) {
         const blankPage = sequentialDoc.addPage([this.pageW, this.pageH]);
+
+        blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
       }
     }
     const cleanSequentialBytes = await sequentialDoc.save();
@@ -167,12 +170,12 @@ export class GeneratePdfService {
       sheet.drawPage(embeddedLeft, { x: 0, y: 0, width: this.pageW, height: this.pageH });
       sheet.drawPage(embeddedRight, { x: this.pageW + 30, y: 0, width: this.pageW, height: this.pageH });
 
-      sheet.drawLine({
-        start: { x: this.pageW, y: 0 },
-        end: { x: this.pageW, y: sheetH },
-        thickness: 0.5,
-        color: rgb(0.85, 0.85, 0.85)
-      });
+      // sheet.drawLine({
+      //   start: { x: this.pageW, y: 0 },
+      //   end: { x: this.pageW, y: sheetH },
+      //   thickness: 0.5,
+      //   color: rgb(0.85, 0.85, 0.85)
+      // });
     }
 
     finalBookletDoc.setTitle(`${data.name} Character Booklet`);
@@ -462,7 +465,7 @@ export class GeneratePdfService {
 
       page.drawRectangle({ x: startX + colW * 9, y: currentY - rowH, width: colW * 3, height: rowH, borderColor: RED, borderWidth: 0.5 });
 
-      let rechargeText = resource.recharge === "long" ? "Long Rest" : resource.recharge === "short" ? "Short Rest" : "";
+      let rechargeText = resource.recharge === "long" ? "Long Rest" : resource.recharge === "short" ? "Short Rest" : resource.recharge;
 
       let valueX = this.centerText(rechargeText, colW * 3, 8, font);
 
