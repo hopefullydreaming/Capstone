@@ -9,7 +9,7 @@
 
             <div class="flex flex-col gap-1">
                 <label for="name">Name:</label>
-                <input type="text" pInputText 
+                <input type="text" pInputText
                        class="w-full sm:w-96" id="name"
                        formControlName="name"
                        required />
@@ -17,8 +17,17 @@
 
             <div class="flex flex-col gap-1">
                 <label for="background_row_id">Background</label>
-                <p-select [options]="backgrounds()" optionLabel="name" optionValue="row_id"  pSize="small"
-                          placeholder="Select a Background" formControlName="background_row_id" />
+                <p-select [options]="backgrounds()" optionLabel="name" optionValue="row_id" pSize="small"
+                          placeholder="Select a Background" formControlName="background_row_id">
+                    <ng-template #item let-item>
+                        <div class="flex-col">
+                            <p>{{ item.name }}</p>
+                            <p class="text-xs text-gray-500">{{ item.skill_proficiencies }}</p>
+                            <p class="text-xs text-gray-500">{{ item.tool_proficiencies }}</p>
+                            <p class="text-xs text-gray-500">{{ item.languages }}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
             </div>
 
             <div class="flex flex-col gap-1">

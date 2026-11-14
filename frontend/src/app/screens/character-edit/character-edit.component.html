@@ -5,7 +5,7 @@
     <div class="flex flex-row">
     <div class="flex flex-col">
         <p class="text-xl">{{character().name}}</p>
-        <p>{{character().background_name}} {{character().subspecies_name ?? character().species_name}}</p>
+        <p>{{character().subspecies_name ?? character().species_name}} {{character().background_name}}</p>
         <p>Level {{character().level}} {{character().subclass_name}} {{character().class_name}}</p>
 
     </div>
@@ -190,14 +190,6 @@
                     }
 
 
-                    <!--@for(resource of resources; track resource.name;){
-    <tr class="border border-purple-300">
-        <td class="py-1 px-1.5 text-xs border-x border-purple-300 leading-[0.625rem] content-center" colspan="7">{{ resource.name }}</td>
-        <td class="p-0.5 text-center border-x border-purple-300" colspan="2"><span class="text-gray-300">{{ getResourceMax(resource.max) }}</span>&nbsp;&nbsp;/&nbsp;&nbsp;{{ getResourceMax(resource.max) }}</td>
-        <td class="p-0.5 text-center border-x border-purple-300" colspan="12"></td>
-    </tr>
-    }-->
-
                     <tr class="border border-purple-300 border-t-2">
                         <td class="p-0.5 text-center border-x border-purple-300" colspan="12">Equipment</td>
                     </tr>
@@ -339,6 +331,7 @@
             <th class="p-2">Level</th>
             <th class="p-2">Name</th>
             <th class="p-2">Description</th>
+            <th class="p-2">Print</th>
         </tr>
 
         @for(feature of character().class_features; track feature.row_id;){
@@ -348,6 +341,7 @@
             <td class="p-2">{{feature.level}}</td>
             <td class="p-2">{{feature.name}}</td>
             <td class="p-2">{{feature.description}}</td>
+            <td class="p-2">{{ getPrinted(feature) }}</td>
         </tr>
 
         }

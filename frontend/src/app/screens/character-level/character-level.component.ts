@@ -83,6 +83,11 @@ export class CharacterLevelComponent {
   data: any = {};
 
   skillChoices: any[] = [];
+  expChoices: any[] = [];
+
+  expLevel: number;
+  expLabel = signal<string>("")
+  expPlaceholder = signal<string>("")
 
   level: number;
   targetLevel: number;
@@ -99,6 +104,7 @@ export class CharacterLevelComponent {
   // };
 
   skillArray = signal<FormArray>(null);
+  expArray = signal<FormArray>(null);
   choiceArray = signal<FormArray>(null);
 
   form: FormGroup = this.fb.group({});
@@ -189,6 +195,8 @@ export class CharacterLevelComponent {
                   this.addChoice(featureData.choice)
                 }
 
+
+
               }
               catch (e) {
                 continue;
@@ -230,7 +238,7 @@ export class CharacterLevelComponent {
         else {
           this.skillArray.set(null);
         }
-
+        
 
       },
       error: (err) => console.error(err)
@@ -261,21 +269,48 @@ export class CharacterLevelComponent {
 
   addChoice(choiceObj: any) {
 
-    this.choiceOptions = choiceObj.options
-    this.choiceId = choiceObj.id;
+    if (choiceObj.options) {
+      this.choiceOptions = choiceObj.options
+      this.choiceId = choiceObj.id;
 
-    let choicesArray = this.fb.array([])
+      let choicesArray = this.fb.array([])
 
-    for (let i = 0; i < choiceObj.number; i++) {
-      choicesArray.push(new FormControl(null, [Validators.required]))
-      console.log("ADD CONTROL")
+      for (let i = 0; i < choiceObj.number; i++) {
+        choicesArray.push(new FormControl(null, [Validators.required]))
+        console.log("ADD CONTROL")
+      }
+      console.log("choice ARRAY", choicesArray)
+      console.log("choice opts", this.choiceOptions)
+
+      this.form.registerControl("choiceArray", choicesArray)
+
+      this.choiceArray.set(choicesArray);
     }
-    console.log("choice ARRAY", choicesArray)
-    console.log("choice opts", this.choiceOptions)
 
-    this.form.registerControl("choiceArray", choicesArray)
+    if (choiceObj.exp) {
 
-    this.choiceArray.set(choicesArray);
+      this.expChoices = this.skillList.filter(s => choiceObj.exp.find((skill: any) => skill === s.id) !== undefined);
+
+      let expsArray = this.fb.array([]);
+      this.expLevel = choiceObj.level;
+      this.expLabel.set(choiceObj.label);
+      this.expPlaceholder.set(choiceObj.placeholder);
+
+      for (let i = 0; i < choiceObj.number; i++) {
+        expsArray.push(new FormControl(null, [Validators.required]));
+        console.log("ADD CONTROL");
+      }
+      console.log("SKILL ARRAY", expsArray);
+      console.log("skill choices", this.expChoices);
+
+      this.form.registerControl("expArray", expsArray);
+
+      this.expArray.set(expsArray);
+
+    }
+    else {
+      this.expArray.set(null);
+    }
 
   }
 
@@ -326,6 +361,17 @@ export class CharacterLevelComponent {
 
       console.log("SKILLS AFTER: ", skills)
     }
+
+    console.log("SKILLS BEFORE:", this.data.skills)
+
+    if (this.expArray() != null) {
+      let values = this.expArray().getRawValue();
+      console.log("SKILLS RAW VALUE", values)
+      for (let s in values) skills[values[s].id] = this.expLevel;
+
+      console.log("SKILLS AFTER: ", skills)
+    }
+
 
     let choices = this.data.choices ?? {}
     console.log("choices BEFORE:", this.data.choices)

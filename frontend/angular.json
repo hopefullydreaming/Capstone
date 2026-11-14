@@ -24,7 +24,10 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/material-theme.scss", "src/styles.css"]
+            "styles": [ "src/material-theme.scss", "src/styles.css" ],
+            "scripts": [
+              "node_modules/@pdf-lib/fontkit/dist/fontkit.umd.js"
+            ]
           },
           "configurations": {
             "production": {

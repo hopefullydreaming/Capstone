@@ -3,7 +3,7 @@ import { DataService } from '../../services/data.service';
 import { CharacterRecord, ClassFeature, SpeciesFeature, Resource, CharacterDetail } from "../../models/models";
 import { ActivatedRoute, Router } from '@angular/router'
 import { FloorPipe } from '../../pipes/floor-pipe';
-import { GeneratePdfService } from '../../services/generate-pdf.service'
+import { GeneratePdfService, CharacterData, StatBlock } from '../../services/generate-pdf.service'
 
 
 
@@ -78,10 +78,13 @@ export class CharacterEditComponent {
         this.character.set(data);
         this.char = data;
         this.data = JSON.parse(data.data);
-        console.log("CharacterRecord: ", this.character(), this.data);
-        // this.getFeatures();
 
-        this.resources = this.data.resources;
+        // this.resources = this.data.resources; 
+        this.data.resources.forEach((r: Resource) => {
+          this.resources.push({...r, max_value: this.getResourceMax(r.max)})
+        })
+
+
         this.senses = this.data.senses;
       },
       error: (err) => console.error(err)
@@ -148,15 +151,44 @@ export class CharacterEditComponent {
   }
 
   levelUp(row_id: number) {
-    console.log("level up clicked for row id: ", row_id);
-
     this.router.navigate(['/character', row_id, 'level', this.char.level + 1], { replaceUrl: true, state: { level: this.char.level + 1, class_row_id: this.char.class_row_id } });
   }
 
   async downloadPdf(row_id: number) {
-    console.log("download clicked for row id: ", row_id);
+    console.log("download clicked for row id: ", row_id, this.char, this.data);
 
-    // await this.pdfService.generateBooklet();
+
+    let data = {
+      ac: 10 + this.getModifier("dex"),
+      stats: {
+        str: this.char.strength,
+        dex: this.char.dexterity,
+        con: this.char.constitution,
+        int: this.char.intelligence,
+        wis: this.char.wisdom,
+        cha: this.char.charisma,
+      },
+      speed: this.data.speed,
+      max_hp: this.data.max_hp,
+      level: this.char.level,
+      name: this.char.name,
+      class_name: this.char.class_name,
+      hit_dice: this.data.hit_dice,
+      skills: this.data.skills,
+      saves: this.data.saves,
+      senses: this.data.senses,
+      choices: this.data.choices,
+      resources: this.resources,
+
+      background_feature: this.char.background_feature,
+      background_feature_name: this.char.background_feature_name,
+
+      class_features: this.char.class_features,
+      species_features: this.char.species_features } as CharacterData;
+
+    console.log("DATA", data)
+
+    await this.pdfService.generateAccessibleBooklet(data);
   }
 
 
@@ -240,6 +272,23 @@ export class CharacterEditComponent {
     }
 
     return prof
+  }
+
+  getPrinted(feature: any): string {
+    let data = JSON.parse(feature.data);
+
+    if (!!data.print) {
+      let choice = this.data.choices[data.choice.id] ?? "NOT FOUND"
+
+      let desc = data.choice.options.find((s: any) => {
+        return s.name === choice
+      })
+
+      return `${data.print} ${choice}. ${desc.desc}`
+    }
+
+    return feature.description
+
   }
 
   getProfDisplay(skill: string): string {

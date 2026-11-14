@@ -535,6 +535,7 @@ app.get('/api/character/:row_id', authenticateJWT, async (req, res) => {
 
             a.background_row_id, 
             f.name AS background_name, f.description AS background_description,
+            f.feature_name AS background_feature_name, f.feature AS background_feature,
 
             a.strength, a.dexterity, a.constitution, a.intelligence, a.wisdom, a.charisma, a.data
 

@@ -85,7 +85,6 @@ export class CharacterAddComponent {
     this.dataService.getBackgrounds().subscribe({
       next: (data: Background[]) => {
         this.backgrounds.set(data);
-        // console.log("BACKGROUNDS: ", this.backgrounds())
 
       },
       error: (err) => console.error(err)
@@ -94,7 +93,6 @@ export class CharacterAddComponent {
     this.dataService.getClasses().subscribe({
       next: (data: Class[]) => {
         this.classes.set(data);
-        // console.log("CLASSES: ", this.classes())
 
       },
       error: (err) => console.error(err)
@@ -103,7 +101,6 @@ export class CharacterAddComponent {
     this.dataService.getAllSubclasses().subscribe({
       next: (data: Subclass[]) => {
         this.subclasses.set(data);
-        // console.log("SUBCLASSES: ", this.subclasses())
 
       },
       error: (err) => console.error(err)
@@ -113,7 +110,6 @@ export class CharacterAddComponent {
     this.dataService.getSpecies().subscribe({
       next: (data: Species[]) => {
         this.species.set(data);
-        // console.log("SPECIES: ", this.species())
 
       },
       error: (err) => console.error(err)
@@ -122,7 +118,6 @@ export class CharacterAddComponent {
     this.dataService.getAllSubspecies().subscribe({
       next: (data: Subspecies[]) => {
         this.subspecies.set(data);
-        // console.log("SUBSPECIES: ", this.subspecies())
 
       },
       error: (err) => console.error(err)
@@ -161,28 +156,25 @@ export class CharacterAddComponent {
   }
 
 
- 
 
-  getFeatures(class_row_id: number, level: number, species_row_id: number, stats: any, background_row_id: number, subclass_row_id: number = null,  subspecies_row_id: number = null) {
+
+  getFeatures(class_row_id: number, level: number, species_row_id: number, stats: any, background_row_id: number, subclass_row_id: number = null, subspecies_row_id: number = null) {
 
     let features: any = {};
+    let skills: any = {};
     let resources: any[] = [];
     let senses: any[] = [];
-    // console.log("GET FEATURES")
 
     this.dataService.getSpeciesFeatures(species_row_id, subspecies_row_id).subscribe({
       next: (d: SpeciesFeature[]) => {
         this.speciesFeatures.set(d);
         for (let i in d) {
           try {
-            // console.log("FEATURE DATA: ", d[i].data, d[i].name);
             let featureData = JSON.parse(d[i].data)
-            // console.log("FEATURE DATA: ", featureData, d[i].name);
             if (!!featureData.resource) {
               resources.push(featureData.resource);
             }
             if (!!featureData.asi) {
-
               Object.keys(featureData.asi).forEach((key) => {
                 this.handleASI(key, stats, featureData.asi[key]);
               });
@@ -191,9 +183,12 @@ export class CharacterAddComponent {
               if (!!features.speed && featureData.speed.walking > features.speed.walking) {
                 features = { ...features, speed: featureData.speed };
               }
-              else if(!features.speed) {
+              else if (!features.speed) {
                 features = { ...features, speed: featureData.speed };
               }
+            }
+            if (!!featureData.skills) {
+              skills = { ...skills, ...featureData.skills };
             }
             if (!!featureData.sense) {
 
@@ -205,9 +200,6 @@ export class CharacterAddComponent {
               else {
                 senses[index] = featureData.sense
               }
-
-
-              // console.log("SENSE: ", senses, featureData.sense)
             }
           }
           catch (e) {
@@ -215,66 +207,34 @@ export class CharacterAddComponent {
           }
         }
 
-        // this.dataService.getLevelOneClassFeatures(class_row_id, subclass_row_id).subscribe({
-        //   next: (d: ClassFeature[]) => {
-        //     this.classFeatures.set(d);
-        //     for (let i in d) {
-        //       try {
-        //         let featureData = JSON.parse(d[i].data)
-        //         if (!!featureData.resource) {
-        //           resources.push(featureData.resource)
-        //         }
-        //         if (!!featureData.sense) {
-        //           senses.push(featureData.sense);
-        //         }
-        //       }
-        //       catch (e) {
-        //         continue;
-        //       }
-        //     }
-
-            // now all are loaded
-        // console.log("FEATURES: ", resources, this.classFeatures(), this.speciesFeatures());
-
         let bgObj = this.backgrounds().find(b => b.row_id == background_row_id);
 
-            let classObj = this.classes().find(c => c.row_id == class_row_id);
-            let conMod = Math.floor((stats.constitution - 10) / 2);
+        let classObj = this.classes().find(c => c.row_id == class_row_id);
+        let conMod = Math.floor((stats.constitution - 10) / 2);
 
-            let maxHp = classObj.hit_dice + ((level - 1) * ((classObj.hit_dice / 2) + 1)) + (conMod * level)
+        let maxHp = classObj.hit_dice + ((level - 1) * ((classObj.hit_dice / 2) + 1)) + (conMod * level)
 
-            let saves = JSON.parse(classObj.data).saves
-            let skills = JSON.parse(bgObj.data).skills
+        let saves = JSON.parse(classObj.data).saves
+        let allskills = { ...skills, ...JSON.parse(bgObj.data).skills }
 
-            let payload = {
-              row_id: this.row_id(),
-              stats: stats,
-              level: level,
-              data: JSON.stringify({
-                ...features,
-                saves: saves,
-                skills: skills,
-                max_hp: maxHp,
-                hit_dice: classObj.hit_dice,
-                resources: resources,
-                senses: senses,
-              })
-            }
+        let payload = {
+          row_id: this.row_id(),
+          stats: stats,
+          level: level,
+          data: JSON.stringify({
+            ...features,
+            saves: saves,
+            skills: allskills,
+            max_hp: maxHp,
+            hit_dice: classObj.hit_dice,
+            resources: resources,
+            senses: senses,
+          })
+        }
 
-            console.log("PAYLOAD", payload)
-
-            this.dataService.putCharacterData(payload, this.row_id()).subscribe(() => {
-              // if (level > 1) {
-                this.router.navigate(['/character',this.row_id(),'level', 1], { replaceUrl: true, state: { level: level, classObj: classObj } })
-              // }
-              // else {
-              //   this.router.navigate(['/character', this.row_id()], { replaceUrl: true })
-              // }
-            })
-
-        //   },
-        //   error: (err) => console.error(err)
-        // });
+        this.dataService.putCharacterData(payload, this.row_id()).subscribe(() => {
+          this.router.navigate(['/character', this.row_id(), 'level', 1], { replaceUrl: true, state: { level: level, classObj: classObj } })
+        });
       },
       error: (err) => console.error(err)
     });
@@ -316,13 +276,9 @@ export class CharacterAddComponent {
       data: "{}"
     }
 
-    // console.log("PAYLOAD: ", payload)
     this.dataService.postCharacter(payload).subscribe((val: any) => {
-      this.row_id.set(val[0].insertId)
-
+      this.row_id.set(val[0].insertId);
       this.getFeatures(values.class_row_id, values.level, values.species_row_id, stats, values.background_row_id, values.subclass_row_id, values.subspecies_row_id);
-
-      console.log("POST CHAR VAL: ", val, this.row_id())
     })
 
   }

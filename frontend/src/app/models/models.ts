@@ -66,7 +66,12 @@ export type SpeciesFeature = {
 export type Background = {
   row_id: number;
   name: string;
+  skill_proficiencies: string;
+  tool_proficiencies: string;
+  languages: string;
   description: string;
+  feature: string;
+  feature_name: string;
   data: string;
 }
 
@@ -137,6 +142,8 @@ export type CharacterDetail = {
   background_row_id?: number;
   background_name?: string;
   background_description?: string;
+  background_feature?: string;
+  background_feature_name?: string;
 
   strength: number;
   dexterity: number;
@@ -156,6 +163,7 @@ export type CharacterDetail = {
 export type Resource = {
   name: string;
   max: number;
+  max_value?: number;
   recharge: string;
 }
 
