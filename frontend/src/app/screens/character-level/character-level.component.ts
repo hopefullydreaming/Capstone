@@ -159,6 +159,11 @@ export class CharacterLevelComponent {
 
     this.targetLevel = history.state.level
 
+    this.skillArray.set(null);
+    this.expArray.set(null);
+    this.choiceArray.set(null);
+    this.choiceOptions = [];
+    this.choiceId = "";
 
     this.dataService.getCharacterRecord(this.row_id()).subscribe({
       next: (data: CharacterRecord) => {
@@ -167,13 +172,6 @@ export class CharacterLevelComponent {
         this.data = JSON.parse(data.data);
         console.log("CharacterRecord: ", this.character(), this.data);
 
-
-        // this.getFeatures();
-
-        // this.resources = this.data.resources;
-        // this.senses = this.data.senses;
-
-        // if (this.level > 1) {
 
 
         let features: any = {};
@@ -277,10 +275,12 @@ export class CharacterLevelComponent {
 
       for (let i = 0; i < choiceObj.number; i++) {
         choicesArray.push(new FormControl(null, [Validators.required]))
+        choicesArray.at(i).updateValueAndValidity();
+
         console.log("ADD CONTROL")
       }
       console.log("choice ARRAY", choicesArray)
-      console.log("choice opts", this.choiceOptions)
+      console.log("choice opts", this.choiceOptions, this.choiceId)
 
       this.form.registerControl("choiceArray", choicesArray)
 
@@ -381,7 +381,7 @@ export class CharacterLevelComponent {
       console.log("SKILLS RAW VALUE", values)
       for (let s in values) choices[this.choiceId] = values[s];
 
-      console.log("SKILLS AFTER: ", skills)
+      console.log("choices AFTER: ", choices)
     }
 
     // now all are loaded

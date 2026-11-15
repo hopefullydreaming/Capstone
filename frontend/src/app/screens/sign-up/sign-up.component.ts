@@ -1,12 +1,16 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-// import { form } from '@angular/forms/signals';
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
+
 @Component({
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    InputTextModule,
+    ButtonModule,
   ],
   selector: 'app-sign-up.component',
   styleUrl: './sign-up.component.css',
@@ -24,6 +28,11 @@ export class SignUpComponent {
   });
 
   ngOnInit() {
+  }
+
+
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 
   submit() {
@@ -45,8 +54,7 @@ export class SignUpComponent {
         }
       },
       error: (err) => {
-        console.log("ERROR LOGGING IN", err)
-          this.router.navigate(['/profile'])
+        console.log("ERROR LOGGING IN", err);
       }
     })
 

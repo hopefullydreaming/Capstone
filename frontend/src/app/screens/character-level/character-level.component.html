@@ -19,40 +19,53 @@
 
 
 <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
-    @if(skillArray()){
+    @if(skillArray().controls.length > 0){
     <div formArrayName="skillArray" class="flex flex-col gap-4 items-center mt-6">
         <p>Background Skills</p>
-        @for (skillGroup of skillArray().controls; track $index) {
+        <!--@for (skillGroup of skillArray().controls; track $index) {-->
+        @for (skillGroup of skillArray().controls; track skillGroup; let i = $index) {
 
         <p-select [options]="skillChoices" placeholder="Skill Choice" [formControlName]="$index">
+        <!--<p-select [options]="skillChoices" placeholder="Skill Choice" [formControl]="skillGroup">-->
         </p-select>
+        
+        } @empty {
+        <p>no skills</p>
         }
     </div>
     }
 
-    @if(expArray()){
+    @if(expArray().controls.length > 0){
     <div formArrayName="expArray" class="flex flex-col gap-4 items-center mt-6">
         <p>{{ expLabel() }}</p>
-        @for (skillGroup of expArray().controls; track $index) {
+        <!--@for (skillGroup of expArray().controls; track $index) {-->
+        @for (skillGroup of expArray().controls; track skillGroup; let i = $index) {
 
         <p-select [options]="expChoices" [placeholder]="expPlaceholder()" [formControlName]="$index">
+        <!--<p-select [options]="expChoices" [placeholder]="expPlaceholder()" [formControl]="skillGroup">-->
         </p-select>
+        }@empty {
+        <p>no exp</p>
         }
     </div>
     }
 
-    @if(choiceArray()){
+    @if(choiceArray().controls.length > 0){
     <div formArrayName="choiceArray" class="flex flex-col gap-4 items-center mt-6">
-        @for (choice of choiceArray().controls; track $index) {
-
+        <!--@for (choice of choiceArray().controls; track $index;) {-->
+        @for (choice of choiceArray().controls; track choice; let i = $index;) {
         <!--<div class="flex flex-col gap-1">-->
-        <p-select [options]="choiceOptions" optionLabel="name" optionValue="name" placeholder="Choice" [formControlName]="$index">
+        <!--<p-select [options]="choiceOptions" optionLabel="name" optionValue="name" placeholder="Choice" [formControlName]="$index">-->
+        <p-select [options]="choiceOptions" optionLabel="name" optionValue="name" placeholder="Choice" [formControlName]="i">
+        <!--<p-select [options]="choiceOptions" optionLabel="name" optionValue="name" placeholder="Choice" [formControl]="choice">-->
             <ng-template #item let-item>
                 <div [pTooltip]="item.decription">
                     <p>{{ item.name }}</p>
                 </div>
             </ng-template>
         </p-select>
+        }@empty {
+        <p>no choice</p>
         }
     </div>
     }

@@ -100,6 +100,11 @@ export class CharacterEditComponent {
 
   }
 
+  delete() {
+    this.dataService.deleteCharacter(this.row_id()).subscribe(() => {
+      this.router.navigate(['/characters'], { replaceUrl: true });
+    });
+  }
 
   getResourceMax(data: any): number {
     if (data.table) {

@@ -18,11 +18,13 @@ export class CharacterListingComponent {
 
 
   ngOnInit() {
+    this.refreshData();
+  }
+
+  refreshData() {
     this.dataService.getCharacterListing().subscribe({
       next: (data: CharacterListing[]) => {
         this.characters.set(data);
-        console.log("CharacterListing: ", this.characters())
-
       },
       error: (err) => console.error(err)
     });
@@ -37,12 +39,12 @@ export class CharacterListingComponent {
   }
 
   delete(row_id: number) {
-    console.log("delete clicked for row id: ", row_id);
+    this.dataService.deleteCharacter(row_id).subscribe(() => {
+      this.refreshData();
+    });
   }
 
   levelUp(row_id: number, char: any) {
-    console.log("level up clicked for row id: ", row_id);
-
     this.router.navigate(['/character', row_id, 'level', char.level+1], { replaceUrl: true, state: { level: char.level+1, class_row_id: char.class_row_id } });
   }
 

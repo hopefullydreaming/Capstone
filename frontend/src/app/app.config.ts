@@ -1,10 +1,17 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, inject, provideAppInitializer } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import Nora from '@primeng/themes/nora';
 import { definePreset } from '@primeng/themes';
+
+// import { ApplicationConfig } from '@angular/core';
+import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
+import { credentialsInterceptor } from './services/credentials-interceptor';
+import { AuthService } from './services/auth.service';
+import { errorInterceptor } from './services/error-interceptor';
+
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -26,6 +33,20 @@ const MyPreset = definePreset(Aura, {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(
+      withInterceptors([errorInterceptor, credentialsInterceptor]),
+      // Angular automatically reads XSRF-TOKEN cookie and sends X-XSRF-TOKEN header
+      withXsrfConfiguration({
+        // cookieName: 'SESSIONID',
+        // headerName: 'Basic',
+        cookieName: 'XSRF-TOKEN',
+        headerName: 'X-XSRF-TOKEN',
+      })
+    ),
+    provideAppInitializer(() => {
+      const authService = inject(AuthService);
+      return authService.loadCurrentUser();
+    }),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     providePrimeNG({

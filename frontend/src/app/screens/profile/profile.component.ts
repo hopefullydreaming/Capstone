@@ -24,4 +24,8 @@ export class ProfileComponent {
     console.log("PLACEHOLDER FOR CHANGE PASSWORD")
   }
 
+  homebrewApply() {
+    console.log("PLACEHOLDER FOR HOMEBREW APPLY")
+  }
+
 }

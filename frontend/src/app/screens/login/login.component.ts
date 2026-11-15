@@ -24,9 +24,19 @@ export class LoginComponent {
   errorMsg = signal<string>("");
 
   form: FormGroup = this.fb.group({
-    email: ["", Validators.required],
-    password: ["", Validators.required]
+    email: ["test@example.com", Validators.required],
+    password: ["Password123", Validators.required]
   });
+
+
+  goToSignUp() {
+    this.router.navigate(['/signup']);
+  }
+
+  forgotPassword() {
+    console.log("FORGOT PASS PLACEHOLDER")
+  }
+
 
   submit() {
     console.log("LOGIN ATTEMPT")

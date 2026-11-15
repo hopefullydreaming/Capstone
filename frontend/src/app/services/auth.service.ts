@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, of, shareReplay, BehaviorSubject } from 'rxjs';
+import { Observable, tap, of, shareReplay, BehaviorSubject, catchError } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DataService } from './data.service';
 
@@ -8,6 +8,7 @@ import { DataService } from './data.service';
   providedIn: 'root'
 })
 export class AuthService {
+
   isLoggedIn$ = new BehaviorSubject<boolean>(false);
   public isLoggedIn = toSignal(this.isLoggedIn$)
   
@@ -15,23 +16,14 @@ export class AuthService {
   public userName = toSignal(this.userName$)
 
   dataService = inject(DataService);
+  http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-    let token = localStorage.getItem("id_token")
 
-    if (!!token) {
-      this.dataService.getUsername().subscribe(val => {
-        this.userName$.next(val)
-      })
-      this.isLoggedIn$.next(true)
-    }
-
-  }
 
   signup(body: any) {
     console.log("SIGN UP ATTEMPT")
 
-    return this.http.post<any>('http://localhost:3000/signupattempt', body)
+    return this.http.post<any>('http://localhost:3000/signupattempt', body, { withCredentials: true })
       .pipe(
         tap((val) => {
           this.setSession(val)
@@ -42,7 +34,7 @@ export class AuthService {
   login(body: any) {
     console.log("LOGIN ATTEMPT")
 
-    return this.http.post<any>('http://localhost:3000/loginattempt', body)
+    return this.http.post<any>('http://localhost:3000/loginattempt', body, {withCredentials: true})
       .pipe(
         tap((val) => {
           this.setSession(val)
@@ -50,20 +42,34 @@ export class AuthService {
       shareReplay());
   }
 
+  loadCurrentUser() {
+    return this.dataService.getUsername().pipe(tap(val => {
+      this.setSession(val)
+    }),
+      catchError(() => {
+        // this.currentUserSignal.set(null);
+        return of(null); // Completes cleanly so Angular finishes booting
+      })
+    )
+  }
+
 
   private setSession(authResult: any) {
-    if (!!authResult.token) {
       console.log("AUTH RESULT: ", authResult)
-      localStorage.setItem('id_token', authResult.token);
       this.isLoggedIn$.next(true);
       this.userName$.next(authResult.username);
-    }
   }          
 
 
-  logout(body: any): Observable<boolean> {
-    localStorage.removeItem("id_token");
-    this.isLoggedIn$.next(false);
-    return of(true)
+  logout(body: any) {
+
+
+    return this.http.post<any>('http://localhost:3000/logout', body, { withCredentials: true })
+      .pipe(
+        tap((val) => {
+          this.userName$.next(null);
+          this.isLoggedIn$.next(false);
+        }),
+        shareReplay());
   }
 }

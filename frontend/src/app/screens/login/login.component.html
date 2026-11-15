@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-4 flex flex-col gap-4">
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
         <div class="flex flex-col gap-1">
@@ -18,8 +18,13 @@
                    required />
         </div>
         <div class="text-red-400">{{ errorMsg() }}</div>
-            <button pButton pSize="small" type="submit" class=" w-fit">Login</button>
+        <button pButton pSize="small" type="submit" class=" w-fit">Login</button>
 
     </form>
 
+    <div class="flex flex-col text-center">
+        <p><span (click)="forgotPassword()" class="cursor-pointer text-purple-600 underline w-fit hover:text-purple-800">I forgot my password</span></p>
+        <p>Don't have an account yet? <span (click)="goToSignUp()" class="cursor-pointer text-purple-600 underline w-fit hover:text-purple-800">Sign Up</span></p>
+
+    </div>
 </div>

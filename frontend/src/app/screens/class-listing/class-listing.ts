@@ -27,7 +27,7 @@ export class ClassListing {
       error: (err) => console.error(err)
     });
 
-    this.classService.getSubclasses(3).subscribe({
+    this.classService.getAllSubclasses().subscribe({
       next: (data: Subclass[]) => {
         this.subclasses.set(data);
         console.log("SUBCLASSES: ", this.subclasses())
