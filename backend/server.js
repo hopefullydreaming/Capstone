@@ -1,4 +1,5 @@
 const express = require('express');
+const { Resend } = require('resend');
 
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
@@ -7,18 +8,21 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const db = require('./db');
 
+const uuid = require('uuid');
+
 const app = express();
 app.use(cors({
   origin: 'http://localhost:4200', 
   credentials: true
 }));
 app.use(express.json());
+process.loadEnvFile();
 
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(bodyParser.json());
 
-const JWT_SECRET = 'your-jwt-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 
 app.post('/signupattempt', async (req, res) => {
@@ -36,11 +40,7 @@ app.post('/signupattempt', async (req, res) => {
       res.status(201).send('User registered successfully');
     });
 
-    console.log("RESULT: ", result)
     id = result.insertId
-
-
-    console.log("ID: ", id)
 
     // Create payload for JWT
     const payload = {
@@ -50,7 +50,6 @@ app.post('/signupattempt', async (req, res) => {
 
     // Sign token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-    console.log("TOKEN: ", token)
 
     const isProduction = process.env.NODE_ENV === 'production';
 
@@ -64,10 +63,6 @@ app.post('/signupattempt', async (req, res) => {
     res.json({ message: 'Login successful', username });
 
     res.send(result);
-
-
-
-
 
   } catch (error) {
     res.json({ message: 'regestration error' });
@@ -125,6 +120,112 @@ app.post('/loginattempt', async (req, res) => {
     res.status(404).send('User not found');
   }
 
+});
+
+
+app.post('/forgot-password', async (req, res) => {
+  const email = req.body.email;
+
+  try {
+    // Find the user by email
+    const query = 'SELECT * FROM users WHERE email = ?';
+    const results = await db.query(query, [email], async (err, results) => {
+      if (err) {
+        return res.status(200).json({ message: 'If that email exists, a reset link was sent.' });
+      }
+    });
+
+    if (results.length > 0) {
+      const user = results[0][0];
+
+      const rawToken = uuid.v4();
+
+      const hashedToken = await bcrypt.hash(rawToken, 10);
+
+      let sql = `UPDATE users
+               SET reset_token_hash = ?
+               , reset_token_expires = ?
+
+               WHERE row_id = ?;`;
+
+      let expires = Date.now() + 30 * 60 * 1000;
+
+      const result = await db.query(sql, [hashedToken, expires, user.row_id], async (err, result) => {
+        if (err) throw err;
+      });
+
+      const resetUrl = `http://localhost:4200/reset-password?token=${rawToken}`;
+
+      const { error } = await resend.emails.send({
+        from: 'Support <onboarding@resend.dev>', //Use 'onboarding@resend.dev' for initial testing
+        to: [user.email],
+        subject: 'Reset Your Password',
+        html: `
+        <p>You requested a password reset.</p>
+        <p>Click <a href="${resetUrl}">here</a> to set a new password. This link expires in 30 minutes.</p>
+      `,
+      });
+
+      if (error) {
+        return res.status(500).json({ message: 'Failed to send reset email.' });
+      }
+
+    }
+
+      res.status(200).json({ message: 'If that email exists, a reset link was sent.' });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error while sending email.' });
+    }
+
+});
+
+app.post('/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    let query = `SELECT * FROM users WHERE reset_token_expires > ?;`;
+
+    const results = await db.query(query, [Date.now()], async (err, results) => {
+      if (err) {
+        return res.status(200).json({ message: 'If that email exists, a reset link was sent.' });
+      }
+    });
+
+    if (results.length > 0) {
+      const users = results[0];
+      let user = null;
+
+      for (let i in users) {
+        let isMatch = await bcrypt.compare(token, users[i].reset_token_hash);
+        if (isMatch) {
+          user = users[i]
+        }
+      }
+
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid or expired reset token.' });
+      }
+
+      let passwordHash = await bcrypt.hash(newPassword, 10);
+
+
+      let sql = `UPDATE users
+               SET hash = ?
+               , reset_token_hash = ?
+               , reset_token_expires = ?
+
+               WHERE row_id = ?;`;
+
+
+      const result = await db.query(sql, [passwordHash, null, null, user.row_id], async (err, result) => {
+        if (err) throw err;
+      });
+
+    }
+    res.status(200).json({ message: 'Password has been reset successfully.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error while resetting password.' });
+  }
 });
 
 

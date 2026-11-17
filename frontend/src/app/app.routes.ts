@@ -20,6 +20,8 @@ import { CharacterAddComponent } from './screens/character-add/character-add.com
 import { AuthGuard } from './services/auth-guard';
 import { LoginGuard } from './services/login-guard';
 import { CharacterLevelComponent } from './screens/character-level/character-level.component';
+import { ResetPasswordComponent } from './screens/reset-password/reset-password.component';
+import { ForgotPasswordComponent } from './screens/forgot-password/forgot-password.component';
 
 
 export const routes: Routes = [
@@ -49,6 +51,14 @@ export const routes: Routes = [
   {
     path:"error",
     component: ErrorPageComponent
+  },
+  {
+    path:"reset-password",
+    component: ResetPasswordComponent
+  },
+  {
+    path:"forgot-password",
+    component: ForgotPasswordComponent
   },
   {
     path:"profile",

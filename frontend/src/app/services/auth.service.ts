@@ -72,4 +72,14 @@ export class AuthService {
         }),
         shareReplay());
   }
+
+
+  resetPassword(body: any) {
+    return this.http.post<any>('http://localhost:3000/reset-password', body)
+  }
+
+
+  forgotPassword(email: string) {
+    return this.http.post<any>('http://localhost:3000/forgot-password', {email: email})
+  }
 }

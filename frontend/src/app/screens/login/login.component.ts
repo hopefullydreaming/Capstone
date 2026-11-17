@@ -24,6 +24,8 @@ export class LoginComponent {
   errorMsg = signal<string>("");
 
   form: FormGroup = this.fb.group({
+    // email: ["", Validators.required],
+    // password: ["", Validators.required]
     email: ["test@example.com", Validators.required],
     password: ["Password123", Validators.required]
   });
@@ -34,7 +36,7 @@ export class LoginComponent {
   }
 
   forgotPassword() {
-    console.log("FORGOT PASS PLACEHOLDER")
+    this.router.navigate(['/forgot-password']);
   }
 
 
