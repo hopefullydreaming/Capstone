@@ -90,7 +90,7 @@ app.post('/signupattempt', async (req, res) => {
     // Sign token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = false//process.env.NODE_ENV === 'production';
 
     res.cookie("SESSIONID", token, {
       httpOnly: true,
@@ -142,7 +142,7 @@ app.post('/loginattempt', async (req, res) => {
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-        const isProduction = process.env.NODE_ENV === 'production';
+        const isProduction = false//process.env.NODE_ENV === 'production';
 
         res.cookie("SESSIONID", token, {
           httpOnly: true,
@@ -161,6 +161,7 @@ app.post('/loginattempt', async (req, res) => {
       res.status(404).send('User not found');
     }
   } catch (error) {
+    console.error(error)
     res.status(500).send('an error occured');
 
   }
@@ -292,7 +293,7 @@ app.post('/reset-password', async (req, res) => {
 
 // Logout action
 app.post('/logout', function(req, res) {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = false//process.env.NODE_ENV === 'production';
 
   res.clearCookie('SESSIONID', {
     httpOnly: true,
