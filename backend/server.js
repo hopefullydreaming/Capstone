@@ -10,8 +10,9 @@ const db = require('./db');
 
 const uuid = require('uuid');
 
-process.loadEnvFile();
-
+if (process.env.NODE_ENV !== 'production') {
+  process.loadEnvFile();
+}
 const app = express();
 app.use(cors({
   origin: "https://dnd-chracter-sheet-maker.up.railway.app",
