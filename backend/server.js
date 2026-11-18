@@ -10,19 +10,30 @@ const db = require('./db');
 
 const uuid = require('uuid');
 
+process.loadEnvFile();
+
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:4200', 
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 app.use(express.json());
-process.loadEnvFile();
-
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(bodyParser.json());
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+const PORT = process.env.PORT || 3000;
+
+
+
+app.get('/health', async (req, res) => {
+    res.status(200).json({ message: 'Server is healthy' });
+});
+
+
+
 
 
 app.post('/signupattempt', async (req, res) => {
@@ -152,12 +163,10 @@ app.post('/loginattempt', async (req, res) => {
 });
 
 function checkPasswordValidity(password) {
-
   const is8Char = password.length >= 8;
   const hasUpper = /[A-Z]/.test(password);
   const hasLower = /[a-z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
-  console.log("PASSWORD VALLID: ", is8Char, hasUpper, hasLower, hasNumber, "\n(", is8Char && hasUpper && hasLower && hasNumber, ")")
 
   return is8Char && hasUpper && hasLower && hasNumber;
 }
@@ -334,7 +343,7 @@ app.post('/api/set-password', authenticateJWT, async (req, res) => {
     res.status(409).send('Password must be 8 characters long and contain a number, an uppercase letter and a lowercase letter.');
     return;
   }
-  console.log("AFTER PASS CHECK")
+
   let passwordHash = await bcrypt.hash(newPassword, 10);
 
   try {
@@ -804,7 +813,6 @@ app.get('/api/class_features/:class_row_id/:subclass_row_id/:level', authenticat
 
 
 // Start server
-const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });

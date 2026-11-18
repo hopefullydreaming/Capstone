@@ -92,17 +92,6 @@ export class CharacterLevelComponent {
   level: number;
   targetLevel: number;
 
-  // resources: Resource[] = []
-  // senses: any[] = []
-
-
-  // tooltipOptions: TooltipOptions = {
-  //   showDelay: 150,
-  //   autoHide: false,
-  //   tooltipEvent: 'hover',
-  //   tooltipPosition: 'left'
-  // };
-
   skillArray = signal<FormArray>(null);
   expArray = signal<FormArray>(null);
   choiceArray = signal<FormArray>(null);
@@ -110,43 +99,10 @@ export class CharacterLevelComponent {
   form: FormGroup = this.fb.group({});
 
   ngOnInit() {
-    console.log("\n\nINIT\n\n")
     this.loadData();
-
-
-    // let class_id = history.state.class_row_id
-    // this.dataService.getClasses().subscribe({
-    //   next: (data: Class[]) => {
-    //     this.classes.set(data);
-    //     console.log("CLASSES: ", this.classes())
-
-    //     console.log("class id", class_id, this.classes())
-
-    //     this.classObj.set(this.classes().find(c => c.row_id == class_id));
-
-    //     console.log("class obj", this.classObj())
-    //     this.subclass_level.set(this.classObj().subclass_level)
-
-    //     console.log("subclass lvl", this.subclass_level())
-
-    //   },
-    //   error: (err) => console.error(err)
-    // });
-
-    // this.dataService.getSubclasses(class_id).subscribe({
-    //   next: (data: Subclass[]) => {
-    //     this.subclasses.set(data);
-    //     console.log("SUBCLASSES: ", this.subclasses())
-
-    //   },
-    //   error: (err) => console.error(err)
-    // });
-
-
   }
 
   loadData() {
-    console.log("\n\nLOAD\n\n")
     this.route.params.subscribe(params => {
       const row_id = +params['row_id'];
       this.row_id.set(row_id);
@@ -170,9 +126,6 @@ export class CharacterLevelComponent {
         this.character.set(data);
         this.char = data;
         this.data = JSON.parse(data.data);
-        console.log("CharacterRecord: ", this.character(), this.data);
-
-
 
         let features: any = {};
         let resources: any[] = [];
@@ -184,12 +137,9 @@ export class CharacterLevelComponent {
 
             for (let i in d) {
               try {
-                console.log("DATA: ", d[i].data)
                 let featureData = JSON.parse(d[i].data)
-                console.log("DATA: ", featureData)
 
                 if (!!featureData.choice) {
-                  console.log("ADD CHOICE")
                   this.addChoice(featureData.choice)
                 }
 
@@ -214,8 +164,6 @@ export class CharacterLevelComponent {
 
           let data = JSON.parse(classObj.data);
 
-          console.log("CLASSS OBJ", classObj, data)
-
 
           this.skillChoices = this.skillList.filter(s => data.choice.skills.find((skill: any) => skill === s.id) !== undefined)
 
@@ -223,11 +171,7 @@ export class CharacterLevelComponent {
 
           for (let i = 0; i < data.choice.number; i++) {
             skillsArray.push(new FormControl(null, [Validators.required]))
-            console.log("ADD CONTROL")
           }
-          console.log("SKILL ARRAY", skillsArray)
-          console.log("skill choices", this.skillChoices)
-
           this.form.registerControl("skillArray", skillsArray)
 
           this.skillArray.set(skillsArray);
@@ -276,12 +220,7 @@ export class CharacterLevelComponent {
       for (let i = 0; i < choiceObj.number; i++) {
         choicesArray.push(new FormControl(null, [Validators.required]))
         choicesArray.at(i).updateValueAndValidity();
-
-        console.log("ADD CONTROL")
       }
-      console.log("choice ARRAY", choicesArray)
-      console.log("choice opts", this.choiceOptions, this.choiceId)
-
       this.form.registerControl("choiceArray", choicesArray)
 
       this.choiceArray.set(choicesArray);
@@ -298,10 +237,7 @@ export class CharacterLevelComponent {
 
       for (let i = 0; i < choiceObj.number; i++) {
         expsArray.push(new FormControl(null, [Validators.required]));
-        console.log("ADD CONTROL");
       }
-      console.log("SKILL ARRAY", expsArray);
-      console.log("skill choices", this.expChoices);
 
       this.form.registerControl("expArray", expsArray);
 
@@ -336,9 +272,7 @@ export class CharacterLevelComponent {
 
     for (let i in this.classFeatures()) {
       try {
-        console.log("DATA: ", this.classFeatures()[i].data)
         let featureData = JSON.parse(this.classFeatures()[i].data)
-        console.log("DATA: ", featureData)
         if (!!featureData.resource) {
           resources.push(featureData.resource)
         }
@@ -352,40 +286,27 @@ export class CharacterLevelComponent {
     }
 
     let skills = this.data.skills
-    console.log("SKILLS BEFORE:", this.data.skills)
 
     if (this.skillArray() != null) {
       let values = this.skillArray().getRawValue();
-      console.log("SKILLS RAW VALUE", values)
       for (let s in values) skills[values[s].id] = 1;
 
-      console.log("SKILLS AFTER: ", skills)
     }
 
-    console.log("SKILLS BEFORE:", this.data.skills)
 
     if (this.expArray() != null) {
       let values = this.expArray().getRawValue();
-      console.log("SKILLS RAW VALUE", values)
       for (let s in values) skills[values[s].id] = this.expLevel;
-
-      console.log("SKILLS AFTER: ", skills)
     }
 
 
     let choices = this.data.choices ?? {}
-    console.log("choices BEFORE:", this.data.choices)
 
     if (this.choiceArray() != null) {
       let values = this.choiceArray().getRawValue();
-      console.log("SKILLS RAW VALUE", values)
       for (let s in values) choices[this.choiceId] = values[s];
 
-      console.log("choices AFTER: ", choices)
     }
-
-    // now all are loaded
-    console.log("FEATURES: ", this.data, resources, this.classFeatures(), this.speciesFeatures());
 
     let conMod = Math.floor((stats.constitution - 10) / 2);
     let maxHp;
@@ -414,29 +335,21 @@ export class CharacterLevelComponent {
           senses: [...this.data.senses, ...senses],
         })
       }
-    console.log("PAYLOAD: ", payload)
 
     this.dataService.putCharacterData(payload, this.row_id()).subscribe(() => {
       if (this.targetLevel > this.level) {
         this.router.navigate(['/character', this.row_id(), 'level', this.level + 1], { replaceUrl: true, state: { level: this.targetLevel } });
         this.loadData();
-        console.log("LEVEL", this.level, this.targetLevel)
       }
       else {
         this.router.navigate(['/character', this.row_id()], { replaceUrl: true })
-        console.log("CHAR", this.level, this.targetLevel)
       }
     })
 
 
   }
 
-  ngOnDestroy() {
-console.log("\n\nDESTROY\n\n")
-  }
-
   submit() {
-    console.log("SUBMIT")
 
     this.getFeatures();
 

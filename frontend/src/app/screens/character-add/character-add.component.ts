@@ -241,7 +241,6 @@ export class CharacterAddComponent {
 
   filterBySource<T extends HasSource>(items: T[]): T[] {
     const allowed = this.activeSourceIds();
-    console.log("ALLOWED: ", allowed)
     return items.filter((item) => allowed.has(item.source_row_id));
   }
 

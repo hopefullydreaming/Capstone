@@ -40,15 +40,11 @@ export class SignUpComponent {
       email: values.email,
       password: values.password
     }
-    console.log("BODY: ", body, values)
+
     this.authService.signup(body).subscribe({
       next: () => {
-        console.log("IS LOGGED IN: ", this.authService.isLoggedIn())
         if (this.authService.isLoggedIn()) {
           this.router.navigate(['/dashboard'])
-        }
-        else {
-          console.log("SIGNUP ERROR")
         }
       },
       error: (err) => {

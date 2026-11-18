@@ -16,6 +16,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "allowedCommonJsDependencies": [
+              "pako",
+              "@pdf-lib/fontkit"
+            ],
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
@@ -24,16 +28,16 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/material-theme.scss", "src/styles.css"],
-            "scripts": ["node_modules/@pdf-lib/fontkit/dist/fontkit.umd.js"]
+            "styles": [ "src/material-theme.scss", "src/styles.css" ],
+            "scripts": [ "node_modules/@pdf-lib/fontkit/dist/fontkit.umd.js" ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",

@@ -13,7 +13,7 @@ export class AuthService {
 
   isLoggedIn$ = new BehaviorSubject<boolean>(false);
   public isLoggedIn = toSignal(this.isLoggedIn$)
-  
+
   userName$ = new BehaviorSubject<string>('');
   public userName = toSignal(this.userName$)
 
@@ -27,44 +27,41 @@ export class AuthService {
 
 
   signup(body: any) {
-    console.log("SIGN UP ATTEMPT")
 
     return this.http.post<any>(`${this.baseUrl}/signupattempt`, body, { withCredentials: true })
       .pipe(
         tap((val) => {
           this.setSession(val)
         }),
-      shareReplay());
+        shareReplay());
   }
 
   login(body: any) {
-    console.log("LOGIN ATTEMPT")
 
-    return this.http.post<any>(`${this.baseUrl}/loginattempt`, body, {withCredentials: true})
+    return this.http.post<any>(`${this.baseUrl}/loginattempt`, body, { withCredentials: true })
       .pipe(
         tap((val) => {
           this.setSession(val)
         }),
-      shareReplay());
+        shareReplay());
   }
 
   loadCurrentUser() {
-    return this.dataService.getUsername().pipe(tap(val => {
-      this.setSession(val)
-    }),
+    return this.dataService.getUsername().pipe(
+      tap(val => {
+        this.setSession(val)
+      }),
       catchError(() => {
-        // this.currentUserSignal.set(null);
-        return of(null); // Completes cleanly so Angular finishes booting
+        return of(null);
       })
     )
   }
 
 
   private setSession(authResult: any) {
-      console.log("AUTH RESULT: ", authResult)
-      this.isLoggedIn$.next(true);
-      this.userName$.next(authResult.username);
-  }          
+    this.isLoggedIn$.next(true);
+    this.userName$.next(authResult.username);
+  }
 
 
   logout(body: any) {
@@ -91,6 +88,6 @@ export class AuthService {
 
 
   forgotPassword(email: string) {
-    return this.http.post<any>(`${this.baseUrl}/forgot-password`, {email: email})
+    return this.http.post<any>(`${this.baseUrl}/forgot-password`, { email: email })
   }
 }

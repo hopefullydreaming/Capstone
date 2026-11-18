@@ -81,7 +81,8 @@ export class GeneratePdfService {
   async generateAccessibleBooklet(data: CharacterData) {
 
     const fontkitModule = await import('@pdf-lib/fontkit');
-    const fontkit = fontkitModule.default || fontkitModule;
+    // const fontkit = fontkitModule.default || fontkitModule;
+    const fontkit = ('default' in fontkitModule ? fontkitModule.default : fontkitModule) as typeof fontkitModule;
 
 
     const sequentialDoc = await PDFDocument.create();

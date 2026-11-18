@@ -1,13 +1,3 @@
-
-
-// for testing
-import { ClassListing } from './screens/class-listing/class-listing';
-
-
-
-
-
-
 import { Routes } from '@angular/router';
 import { ProfileComponent } from './screens/profile/profile.component';
 import { ErrorPageComponent } from './screens/error-page/error-page.component';
@@ -25,68 +15,62 @@ import { ForgotPasswordComponent } from './screens/forgot-password/forgot-passwo
 
 
 export const routes: Routes = [
-  // for testing only
-  {
-    path:"test",
-    component: ClassListing
-  },
-
 
   // routes
   {
-    path:"signup",
-    component: SignUpComponent,
+    path: "signup",
+    loadComponent: () => import('./screens/sign-up/sign-up.component').then((m) => m.SignUpComponent),
     canActivate: [LoginGuard]
   },
   {
-    path:"login",
-    component: LoginComponent,
+    path: "login",
+    loadComponent: () => import('./screens/login/login.component').then((m) => m.LoginComponent),
     canActivate: [LoginGuard]
   },
   {
     path:"dashboard",
-    component: DashboardComponent,
+    loadComponent: () => import('./screens/dashboard/dashboard.component').then((m) => m.DashboardComponent),
     canActivate: [AuthGuard]
   },
   {
     path:"error",
-    component: ErrorPageComponent
+    loadComponent: () => import('./screens/error-page/error-page.component').then((m) => m.ErrorPageComponent)
   },
   {
     path:"reset-password",
-    component: ResetPasswordComponent
+    loadComponent: () => import('./screens/reset-password/reset-password.component').then((m) => m.ResetPasswordComponent)
   },
   {
-    path:"forgot-password",
-    component: ForgotPasswordComponent
+    path: "forgot-password",
+    loadComponent: () => import('./screens/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent)
   },
   {
     path:"profile",
-    component: ProfileComponent,
+    loadComponent: () => import('./screens/profile/profile.component').then((m) => m.ProfileComponent),
     canActivate: [AuthGuard]
   },
 
   {
     path:"characters",
-    component: CharacterListingComponent,
+    loadComponent: () => import('./screens/character-listing/character-listing.component').then((m) => m.CharacterListingComponent),
     canActivate: [AuthGuard]
   },
 
   {
     path:"character/new",
-    component: CharacterAddComponent,
+    loadComponent: () => import('./screens/character-add/character-add.component').then((m) => m.CharacterAddComponent),
     canActivate: [AuthGuard]
   },
 
   {
     path:"character/:row_id",
-    component: CharacterEditComponent,
+    loadComponent: () => import('./screens/character-edit/character-edit.component').then((m) => m.CharacterEditComponent),
     canActivate: [AuthGuard]
   },
 
   {
     path:"character/:row_id/level/:level",
-    component: CharacterLevelComponent,
+    loadComponent: () => import('./screens/character-level/character-level.component').then((m) => m.CharacterLevelComponent),
     canActivate: [AuthGuard]
   },
 

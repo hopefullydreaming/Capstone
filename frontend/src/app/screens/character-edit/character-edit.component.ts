@@ -167,8 +167,6 @@ export class CharacterEditComponent {
   }
 
   async downloadPdf(row_id: number) {
-    console.log("download clicked for row id: ", row_id, this.char, this.data);
-
 
     let data = {
       ac: 10 + this.getModifier("dex"),
@@ -197,8 +195,6 @@ export class CharacterEditComponent {
 
       class_features: this.char.class_features,
       species_features: this.char.species_features } as CharacterData;
-
-    console.log("DATA", data)
 
     await this.pdfService.generateAccessibleBooklet(data);
   }
