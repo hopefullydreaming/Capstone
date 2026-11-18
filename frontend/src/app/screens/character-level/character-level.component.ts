@@ -36,16 +36,8 @@ export class CharacterLevelComponent {
   route = inject(ActivatedRoute);
   dataService = inject(DataService);
 
-
-  // backgrounds = signal<Background[]>([]);
-  // classes = signal<Class[]>([]);
-  // classObj = signal<Class>(null);
-  // subclasses = signal<Subclass[]>([]);
-  // subclass_level = signal<number | null>(null);
-  // filteredSubclasses = signal<Subclass[]>([]);
-  // species = signal<Species[]>([]);
-  // subspecies = signal<Subspecies[]>([]);
-  // filteredSubspecies = signal<Subspecies[]>([]);
+  isAsiLevel = signal<boolean>(false);
+  classObj = signal<any>(null);
 
   row_id = signal<number | null>(null);
   character = signal<CharacterRecord | null>(null);
@@ -78,7 +70,19 @@ export class CharacterLevelComponent {
     { id: "survival", label: "Survival" }
   ]
 
+  asiTypes = [
+    { id: "plusTwo", label: "One +2" },
+    { id: "twoPlusOnes", label: "Two +1s" }
+  ]
 
+  abilities = [
+    { id: "str", label: "Strength" },
+    { id: "dex", label: "Dexterity" },
+    { id: "con", label: "Constitution" },
+    { id: "int", label: "Intelligence" },
+    { id: "wis", label: "Wisdom" },
+    { id: "cha", label: "Charisma" },
+  ]
 
   data: any = {};
 
@@ -96,7 +100,12 @@ export class CharacterLevelComponent {
   expArray = signal<FormArray<FormControl>>(null);
   choiceArray = signal<FormArray<FormControl>>(null);
 
-  form: FormGroup = this.fb.group({});
+  form: FormGroup = this.fb.group({
+    asiType: [null],
+    asi2: [null],
+    asi1a: [null],
+    asi1b: [null]
+  });
 
   ngOnInit() {
     this.loadData();
@@ -130,6 +139,19 @@ export class CharacterLevelComponent {
         let features: any = {};
         let resources: any[] = [];
         let senses: any[] = [];
+
+        this.dataService.getClassData(this.char.class_row_id).subscribe({
+          next: (d: Class) => {
+            this.classObj.set(JSON.parse(d.data))
+            let asiLevels = this.classObj()?.asiLevels as Array<number> ?? [];
+
+            let isAsi = asiLevels.findIndex(l => l == this.level) >= 0;
+            this.isAsiLevel.set(isAsi)
+
+          },
+          error: (err) => console.error(err)
+        });
+
 
         this.dataService.getClassFeatures(this.char.class_row_id, this.level, this.char.subclass_row_id).subscribe({
           next: (d: ClassFeature[]) => {
@@ -291,6 +313,22 @@ export class CharacterLevelComponent {
       let values = this.skillArray().getRawValue();
       for (let s in values) skills[values[s].id] = 1;
 
+    }
+
+
+    if (this.isAsiLevel()) {
+      let values = this.form.getRawValue();
+      switch (values.asiType) {
+        case "plusTwo": {
+          this.handleASI(values.asi2, stats, 2);
+          break;
+        }
+        case "twoPlusOnes": {
+          this.handleASI(values.asi1a, stats, 1);
+          this.handleASI(values.asi1b, stats, 1);
+          break;
+        }
+      }
     }
 
 

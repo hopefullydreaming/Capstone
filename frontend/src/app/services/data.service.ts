@@ -73,6 +73,10 @@ export class DataService {
     return this.http.get<ClassFeature[]>(`${this.apiUrl}/class_features/${class_row_id}/${subclass_row_id}/${level}`);
   }
 
+  getClassData(class_row_id: number): Observable<Class> {
+    return this.http.get<Class>(`${this.apiUrl}/class_data/${class_row_id}/`);
+  }
+
 
   getSpeciesFeatures(species_row_id: number, subspecies_row_id?: number): Observable<SpeciesFeature[]> {
     return this.http.get<SpeciesFeature[]>(`${this.apiUrl}/species_features/${species_row_id}/${subspecies_row_id}`);

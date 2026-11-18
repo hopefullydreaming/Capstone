@@ -429,6 +429,22 @@ app.get('/api/class', authenticateJWT, async (req, res) => {
   }
 });
 
+app.get('/api/class_data/:class_row_id', authenticateJWT, async (req, res) => {
+  let class_row_id = req.params.class_row_id;
+  try {
+
+    let sql = `SELECT * FROM classes WHERE row_id = ?;`;
+
+    const [rows] = await db.query(sql, [class_row_id], async (err, result) => {
+      if (err) throw err;
+    });
+
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 
 // Get all subclasses

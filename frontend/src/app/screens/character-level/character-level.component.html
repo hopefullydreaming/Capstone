@@ -16,16 +16,69 @@
 </table>
 }
 
+@if(isAsiLevel()){
 
+
+<div class="flex flex-row gap-4 items-center align-center">
+    <div class="flex flex-col gap-4 items-center text-center">
+        <p>STR</p>
+        <p class="text-2xl">{{ character().strength}}</p>
+    </div>
+    <div class="flex flex-col gap-4 items-center text-center">
+        <p>DEX</p>
+        <p class="text-2xl">{{ character().dexterity}}</p>
+    </div>
+    <div class="flex flex-col gap-4 items-center text-center">
+        <p>CON</p>
+        <p class="text-2xl">{{ character().constitution}}</p>
+    </div>
+    <div class="flex flex-col gap-4 items-center text-center">
+        <p>INT</p>
+        <p class="text-2xl">{{ character().intelligence}}</p>
+    </div>
+    <div class="flex flex-col gap-4 items-center text-center">
+        <p>WIS</p>
+        <p class="text-2xl">{{ character().wisdom}}</p>
+    </div>
+    <div class="flex flex-col gap-4 items-center text-center">
+        <p>CHA</p>
+        <p class="text-2xl">{{ character().charisma}}</p>
+    </div>
+</div>
+    
+
+
+
+}
 
 <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
+
+    @if(isAsiLevel()){
+    <p-select [options]="asiTypes" optionLabel="label" optionValue="id" placeholder="ASI type" formControlName="asiType" />
+
+
+    @switch (form.get('asiType')?.value) {
+    @case ('plusTwo') {
+    <p-select [options]="abilities" optionLabel="label" optionValue="id" placeholder="ASI" formControlName="asi2" />
+    }
+    @case ('twoPlusOnes') {
+    <p-select [options]="abilities" optionLabel="label" optionValue="id" placeholder="ASI" formControlName="asi1a" />
+    <p-select [options]="abilities" optionLabel="label" optionValue="id" placeholder="ASI" formControlName="asi1b" />
+    }
+    @default {
+    <p>Please select an asi type to continue.</p>
+    }
+    }
+
+    }
+
     @if(skillArray()?.controls?.length > 0){
     <div formArrayName="skillArray" class="flex flex-col gap-4 items-center mt-6">
         <p>Background Skills</p>
         @for (skillGroup of skillArray().controls; track skillGroup; let i = $index) {
         <p-select [options]="skillChoices" placeholder="Skill Choice" [formControl]="skillGroup">
         </p-select>
-        
+
         } @empty {
         <p>no skills</p>
         }
