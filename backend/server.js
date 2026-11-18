@@ -118,46 +118,51 @@ app.post('/loginattempt', async (req, res) => {
   const { email, password } = req.body;
   var id = null;
   var username = null;
+  try {
 
-  // Find the user by email
-  const query = 'SELECT * FROM users WHERE email = ?';
-  const results = await db.query(query, [email], async (err, results) => {
-    if (err) throw err;
-  });
+    // Find the user by email
+    const query = 'SELECT * FROM users WHERE email = ?';
+    const results = await db.query(query, [email], async (err, results) => {
+      if (err) throw err;
+    });
 
-  if (results.length > 0) {
-    const user = results[0][0];
+    if (results.length > 0) {
+      const user = results[0][0];
 
-    const isMatch = await bcrypt.compare(password, user.hash);
+      const isMatch = await bcrypt.compare(password, user.hash);
 
-    if (isMatch) {
-      username = user.username;
-      id = user.row_id;
+      if (isMatch) {
+        username = user.username;
+        id = user.row_id;
 
-      const payload = {
-        id: id,
-        username: username
-      };
+        const payload = {
+          id: id,
+          username: username
+        };
 
-      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-      const isProduction = process.env.NODE_ENV === 'production';
+        const isProduction = process.env.NODE_ENV === 'production';
 
-      res.cookie("SESSIONID", token, {
-        httpOnly: true, 
-        secure: isProduction,   
-        sameSite: 'lax',        
-        path: '/',                
-        maxAge: 60 * 60 * 1000 
-      });
+        res.cookie("SESSIONID", token, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 1000
+        });
 
-      res.json({ message: 'Login successful', username});
+        res.json({ message: 'Login successful', username });
 
+      } else {
+        res.status(401).send('Email or password is incorrect.');
+      }
     } else {
-      res.status(401).send('Email or password is incorrect.');
+      res.status(404).send('User not found');
     }
-  } else {
-    res.status(404).send('User not found');
+  } catch (error) {
+    res.status(500).send('an error occured');
+
   }
 
 });
