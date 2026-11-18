@@ -92,9 +92,9 @@ export class CharacterLevelComponent {
   level: number;
   targetLevel: number;
 
-  skillArray = signal<FormArray>(null);
-  expArray = signal<FormArray>(null);
-  choiceArray = signal<FormArray>(null);
+  skillArray = signal<FormArray<FormControl>>(null);
+  expArray = signal<FormArray<FormControl>>(null);
+  choiceArray = signal<FormArray<FormControl>>(null);
 
   form: FormGroup = this.fb.group({});
 
