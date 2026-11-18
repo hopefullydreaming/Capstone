@@ -1,7 +1,48 @@
 <div class="p-4">
+    <p (click)="toggleFilters()">Filter</p>
+    @if(showFilters()){
+    <div class="flex flex-col items-center">
+        <form [formGroup]="filterForm" class="flex flex-row mx-auto gap-4 mt-6">
 
+            <div class="flex flex-col">
+                <div class="flex flex-row gap-2">
+                    <p-checkbox formControlName="allOfficial" [binary]="true" />
+                    <p>All Official Sources</p>
+                </div>
+                <div formArrayName="officialArray" class="flex flex-col gap-4 mt-6">
+                    @for (official of officialArray().controls; track official; let i = $index;) {
+
+                    <div class="flex flex-row gap-2">
+                        <p-checkbox [formControlName]="i" [binary]="true" />
+                        <p>{{ officialSources()[i].name }}</p>
+                    </div>
+                    }@empty {
+                    <p>no choice</p>
+                    }
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex flex-row gap-2">
+                    <p-checkbox formControlName="allHomebrew" [binary]="true" />
+                    <p>All Homebrew Sources</p>
+                </div>
+                <div formArrayName="homebrewArray" class="flex flex-col gap-4 mt-6">
+                    @for (homebrew of homebrewArray().controls; track homebrew; let i = $index;) {
+
+                    <div class="flex flex-row gap-2">
+                        <p-checkbox [formControlName]="i" [binary]="true" />
+                        <p>{{ homebrewSources()[i].name }}</p>
+                    </div>
+                    }@empty {
+                    <p>no choice</p>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+    }
+    @else{
     <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
-
 
 
 
@@ -152,5 +193,5 @@
         <button pButton pSize="small" type="submit" class=" w-fit">Create</button>
 
     </form>
-
+    }
 </div>

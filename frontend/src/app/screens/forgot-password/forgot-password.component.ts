@@ -20,7 +20,7 @@ export class ForgotPasswordComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  errorMsg = signal<string>("");
+  showForm = signal<boolean>(true);
 
   form: FormGroup = this.fb.group({
     email: ["", Validators.required]
@@ -28,29 +28,9 @@ export class ForgotPasswordComponent {
 
   submit() {
     const values = this.form.getRawValue();
-    const body = {
-      email: values.email
-    }
 
-    this.authService.forgotPassword(values.email).subscribe({
-      next: () => {
-        console.log("IS LOGGED IN: ", this.authService.isLoggedIn())
-        if (this.authService.isLoggedIn()) {
-          this.router.navigate(['/dashboard'])
-        }
-        else {
-          this.errorMsg.set("Error Logging In");
-          console.log("LOGIN ERROR")
-        }
-      },
-      error: (err) => {
-        console.log("ERROR LOGGING IN", err)
-        this.errorMsg.set("Error Logging In But Elsewhere");
-        this.router.navigate(['/login'])
-
-
-
-      }
+    this.authService.forgotPassword(values.email).subscribe(() => {
+      this.showForm.set(false);
     })
 
   }

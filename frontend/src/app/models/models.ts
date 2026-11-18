@@ -1,23 +1,21 @@
 
 // class 
-export type Class = {
+export type Class = HasSource & {
   row_id: number;
   name: string;
   description: string;
   subclass_level: number;
   hit_dice: number;
   data: string;
-  source_row_id: number;
 }
 
-export type Subclass = {
+export type Subclass = HasSource & {
   row_id: number;
   class_row_id: number;
   class_name?: string;
   source_name?: string;
   name: string;
   description: string;
-  source_row_id: number;
 }
 
 export type ClassFeature = {
@@ -36,20 +34,18 @@ export type ClassFeature = {
 
 
 // species 
-export type Species = {
+export type Species = HasSource & {
   row_id: number;
   name: string;
   description: string;
   size: string;
-  source_row_id: number;
 }
 
-export type Subspecies = {
+export type Subspecies = HasSource & {
   row_id: number;
   species_row_id: number;
   name: string;
   description: string;
-  source_row_id: number;
 }
 
 export type SpeciesFeature = {
@@ -165,6 +161,19 @@ export type Resource = {
   max: number;
   max_value?: number;
   recharge: string;
+}
+
+
+export interface HasSource {
+  source_row_id: number;
+}
+
+
+
+export type Source = {
+  row_id: number;
+  name: string;
+  is_homebrew: boolean;
 }
 
 

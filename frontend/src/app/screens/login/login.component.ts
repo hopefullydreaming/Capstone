@@ -24,10 +24,8 @@ export class LoginComponent {
   errorMsg = signal<string>("");
 
   form: FormGroup = this.fb.group({
-    // email: ["", Validators.required],
-    // password: ["", Validators.required]
-    email: ["test@example.com", Validators.required],
-    password: ["Password123", Validators.required]
+    email: ["", Validators.required],
+    password: ["", Validators.required]
   });
 
 
@@ -41,31 +39,21 @@ export class LoginComponent {
 
 
   submit() {
-    console.log("LOGIN ATTEMPT")
+
     const values = this.form.getRawValue();
     const body = {
       email: values.email,
       password: values.password
     }
-    console.log("BODY: ", body, values)
+
     this.authService.login(body).subscribe({
       next: () => {
-        console.log("IS LOGGED IN: ", this.authService.isLoggedIn())
         if (this.authService.isLoggedIn()) {
           this.router.navigate(['/dashboard'])
         }
-        else {
-          this.errorMsg.set("Error Logging In");
-          console.log("LOGIN ERROR")
-        }
       },
       error: (err) => {
-        console.log("ERROR LOGGING IN", err)
-        this.errorMsg.set("Error Logging In But Elsewhere");
-        this.router.navigate(['/login'])
-
-
-        
+        this.errorMsg.set(err.error);        
       }
     })
 

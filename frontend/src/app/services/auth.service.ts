@@ -4,6 +4,8 @@ import { Observable, tap, of, shareReplay, BehaviorSubject, catchError } from 'r
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DataService } from './data.service';
 
+import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,11 +21,15 @@ export class AuthService {
   http = inject(HttpClient);
 
 
+  private baseUrl = environment.apiUrl;
+  private apiUrl = `${this.baseUrl}/api`;
+
+
 
   signup(body: any) {
     console.log("SIGN UP ATTEMPT")
 
-    return this.http.post<any>('http://localhost:3000/signupattempt', body, { withCredentials: true })
+    return this.http.post<any>(`${this.baseUrl}/signupattempt`, body, { withCredentials: true })
       .pipe(
         tap((val) => {
           this.setSession(val)
@@ -34,7 +40,7 @@ export class AuthService {
   login(body: any) {
     console.log("LOGIN ATTEMPT")
 
-    return this.http.post<any>('http://localhost:3000/loginattempt', body, {withCredentials: true})
+    return this.http.post<any>(`${this.baseUrl}/loginattempt`, body, {withCredentials: true})
       .pipe(
         tap((val) => {
           this.setSession(val)
@@ -64,7 +70,7 @@ export class AuthService {
   logout(body: any) {
 
 
-    return this.http.post<any>('http://localhost:3000/logout', body, { withCredentials: true })
+    return this.http.post<any>(`${this.baseUrl}/logout`, body, { withCredentials: true })
       .pipe(
         tap((val) => {
           this.userName$.next(null);
@@ -75,11 +81,16 @@ export class AuthService {
 
 
   resetPassword(body: any) {
-    return this.http.post<any>('http://localhost:3000/reset-password', body)
+    return this.http.post<any>(`${this.baseUrl}/reset-password`, body)
+  }
+
+
+  setPassword(body: any) {
+    return this.http.post<any>(`${this.baseUrl}/api/set-password`, body)
   }
 
 
   forgotPassword(email: string) {
-    return this.http.post<any>('http://localhost:3000/forgot-password', {email: email})
+    return this.http.post<any>(`${this.baseUrl}/forgot-password`, {email: email})
   }
 }

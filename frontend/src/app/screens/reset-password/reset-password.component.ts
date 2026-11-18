@@ -27,9 +27,9 @@ export class ResetPasswordComponent {
     this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
   }
 
+  errorMsg = signal<string>("");
 
   form: FormGroup = this.fb.group({
-    // token: ["", Validators.required],
     newPassword: ["", Validators.required]
   });
 
@@ -38,17 +38,37 @@ export class ResetPasswordComponent {
   submit() {
 
     const values = this.form.getRawValue();
-    const body = {
-      token: this.token,
-      newPassword: values.newPassword
-    }
 
-    this.authService.resetPassword(body).subscribe({
-      next: () => {
-        // this.statusMessage.set('Password updated! Redirecting to login...');
-        setTimeout(() => this.router.navigate(['/login']), 2000);
+    if (this.token !== "") {
+      const body = {
+        token: this.token,
+        newPassword: values.newPassword
       }
-    });
+
+      this.authService.resetPassword(body).subscribe({
+          next: () => {
+            this.router.navigate(['/login']);
+          },
+          error: (err) => {
+            this.errorMsg.set(err.error);
+          }
+        });
+    }
+    else {
+      const body = {
+        newPassword: values.newPassword
+      }
+
+      this.authService.setPassword(body).subscribe({
+        next: () => {
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          this.errorMsg.set(err.error);
+        }
+      });
+
+    }
   }
 
 

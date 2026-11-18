@@ -21,7 +21,7 @@ export class ProfileComponent {
   }
 
   changePassword() {
-    console.log("PLACEHOLDER FOR CHANGE PASSWORD")
+    this.router.navigate(['/reset-password'])
   }
 
   homebrewApply() {

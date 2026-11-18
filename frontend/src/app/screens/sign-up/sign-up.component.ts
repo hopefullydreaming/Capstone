@@ -27,9 +27,7 @@ export class SignUpComponent {
     password: ["", Validators.required]
   });
 
-  ngOnInit() {
-  }
-
+  errorMsg = signal<string>("");
 
   goToLogin() {
     this.router.navigate(['/login']);
@@ -54,7 +52,7 @@ export class SignUpComponent {
         }
       },
       error: (err) => {
-        console.log("ERROR LOGGING IN", err);
+        this.errorMsg.set(err.error);
       }
     })
 

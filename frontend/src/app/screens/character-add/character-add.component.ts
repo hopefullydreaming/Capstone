@@ -1,17 +1,20 @@
 import { Component, signal, inject, computed } from '@angular/core';
 import { DataService } from '../../services/data.service';
-import { Class, Subclass, Species, Subspecies, Background, CharacterPayload, ClassFeature, SpeciesFeature } from "../../models/models";
+import { Class, Subclass, Species, Subspecies, Background, CharacterPayload, ClassFeature, SpeciesFeature, Source, HasSource } from "../../models/models";
 import { Router, ActivatedRoute } from '@angular/router'
 import { combineLatest } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 
 import { TooltipModule } from 'primeng/tooltip';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { TooltipOptions } from 'primeng/api';
+
+
 
 
 
@@ -23,6 +26,7 @@ import { TooltipOptions } from 'primeng/api';
     ButtonModule,
     SelectModule,
     TooltipModule,
+    CheckboxModule,
   ],
   selector: 'app-character-add.component',
   styleUrl: './character-add.component.css',
@@ -39,16 +43,51 @@ export class CharacterAddComponent {
   backgrounds = signal<Background[]>([]);
   classes = signal<Class[]>([]);
   subclasses = signal<Subclass[]>([]);
-  filteredSubclasses = signal<Subclass[]>([]);
   species = signal<Species[]>([]);
   subspecies = signal<Subspecies[]>([]);
-  filteredSubspecies = signal<Subspecies[]>([]);
+
+
+  filteredSubclassesByClass = signal<Subclass[]>([]);
+  filteredSubspeciesBySpecies = signal<Subspecies[]>([]);
+
+  filteredSubclasses = computed(() => this.filterBySource(this.filteredSubclassesByClass()));
+  filteredSubspecies = computed(() => this.filterBySource(this.filteredSubspeciesBySpecies()));
 
   row_id = signal<number>(0);
+  showFilters = signal<boolean>(false);
 
+  sources = signal<Source[]>([]);
+  officialSources = signal<Source[]>([]);
+  homebrewSources = signal<Source[]>([]);
 
   classFeatures = signal<ClassFeature[]>([]);
   speciesFeatures = signal<SpeciesFeature[]>([]);
+
+
+  homebrewArray = signal<FormArray>(null);
+  officialArray = signal<FormArray>(null);
+
+  officialChecked = signal<boolean[]>([]);
+  homebrewChecked = signal<boolean[]>([]);
+
+
+  activeSourceIds = computed(() => {
+    const allowedIds = new Set<number>();
+
+    const officialList = this.officialSources();
+    const officialBools = this.officialChecked();
+    officialList.forEach((source, index) => {
+      if (officialBools[index]) allowedIds.add(source.row_id);
+    });
+
+    const homebrewList = this.homebrewSources();
+    const homebrewBools = this.homebrewChecked();
+    homebrewList.forEach((source, index) => {
+      if (homebrewBools[index]) allowedIds.add(source.row_id);
+    });
+
+    return allowedIds;
+  });
 
 
 
@@ -79,6 +118,13 @@ export class CharacterAddComponent {
     intelligence: [10, [Validators.required, Validators.max(20), Validators.min(1)]],
     wisdom: [10, [Validators.required, Validators.max(20), Validators.min(1)]],
     charisma: [10, [Validators.required, Validators.max(20), Validators.min(1)]]
+  });
+
+  filterForm: FormGroup = this.fb.group({
+    allOfficial: [true],
+    officialArray: this.fb.array([]),
+    allHomebrew: [true],
+    homebrewArray: this.fb.array([])
   });
 
   ngOnInit() {
@@ -124,17 +170,80 @@ export class CharacterAddComponent {
     });
 
 
+    this.dataService.getSources().subscribe({
+      next: (data: Source[]) => {
+        this.sources.set(data);
+        this.officialSources.set(this.sources().filter(s => !s.is_homebrew))
+        this.homebrewSources.set(this.sources().filter(s => s.is_homebrew))
+
+        let officialArray = this.filterForm.get("officialArray") as FormArray;
+        for (let i in this.officialSources()) {
+          officialArray.push(new FormControl(true));
+        }
+
+        this.filterForm.registerControl("officialArray", officialArray)
+        this.officialArray.set(officialArray);
+
+
+        this.officialArray().valueChanges
+          .subscribe((values: boolean[]) => {
+            this.officialChecked.set(values); 
+            const allChecked = values.length > 0 && values.every(Boolean);
+            this.filterForm.get("allOfficial")?.setValue(allChecked, { emitEvent: false });
+          });
+
+        this.filterForm.get("allOfficial")?.valueChanges
+          .subscribe((isChecked: boolean) => {
+            const updatedValues = this.officialArray().controls.map(() => isChecked);
+            this.officialArray().setValue(updatedValues, { emitEvent: false });
+          });
+
+
+        let homebrewArray = this.filterForm.get("homebrewArray") as FormArray;
+        for (let i in this.homebrewSources()) {
+          homebrewArray.push(new FormControl(true));
+        }
+
+        this.filterForm.registerControl("homebrewArray", homebrewArray)
+        this.homebrewArray.set(homebrewArray);
+
+
+        this.homebrewArray().valueChanges
+          .subscribe((values: boolean[]) => {
+            this.homebrewChecked.set(values); 
+            const allChecked = values.length > 0 && values.every(Boolean);
+            this.filterForm.get("allHomebrew")?.setValue(allChecked, { emitEvent: false });
+          });
+
+        this.filterForm.get("allHomebrew")?.valueChanges
+          .subscribe((isChecked: boolean) => {
+            const updatedValues = this.homebrewArray().controls.map(() => isChecked);
+            this.homebrewArray().setValue(updatedValues, { emitEvent: false });
+          });
+
+
+      },
+      error: (err) => console.error(err)
+    });
+
+
     this.form.get("class_row_id")?.valueChanges.subscribe(val => {
-      this.filteredSubclasses.set(this.subclasses().filter(s => s.class_row_id == val))
+      this.filteredSubclassesByClass.set(this.subclasses().filter(s => s.class_row_id == val))
     })
 
     this.form.get("species_row_id")?.valueChanges.subscribe(val => {
-      this.filteredSubspecies.set(this.subspecies().filter(s => s.species_row_id == val))
+      this.filteredSubspeciesBySpecies.set(this.subspecies().filter(s => s.species_row_id == val))
     })
 
 
   }
 
+
+  filterBySource<T extends HasSource>(items: T[]): T[] {
+    const allowed = this.activeSourceIds();
+    console.log("ALLOWED: ", allowed)
+    return items.filter((item) => allowed.has(item.source_row_id));
+  }
 
   handleASI(ability: string, stats: any, increase: number): any {
 
@@ -153,6 +262,10 @@ export class CharacterAddComponent {
         return stats.constitution += increase;
     }
     return stats;
+  }
+
+  toggleFilters() {
+    this.showFilters.set(!this.showFilters())
   }
 
 

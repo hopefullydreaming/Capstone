@@ -30,6 +30,34 @@ app.post('/signupattempt', async (req, res) => {
   var id = null;
 
   try {
+
+    // Find the user by email
+    const checkUniqueEmail = 'SELECT * FROM users WHERE email = ?';
+    const emailResults = await db.query(checkUniqueEmail, [email], async (err, results) => {
+      if (err) throw err;
+    });
+
+    if (emailResults[0].length > 0) {
+      res.status(409).send('Email already linked to an account.');
+      return;
+    }
+
+    // Find the user by email
+    const checkUniqueUsername = 'SELECT * FROM users WHERE username = ?';
+    const usernameResults = await db.query(checkUniqueUsername, [username], async (err, results) => {
+      if (err) throw err;
+    });
+
+    if (usernameResults[0].length > 0) {
+      res.status(409).send('Username already taken.');
+      return;
+    }
+
+    if (!checkPasswordValidity(password)) {
+      res.status(409).send('Password must be 8 characters long and contain a number, an uppercase letter and a lowercase letter.');
+      return;
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -65,7 +93,8 @@ app.post('/signupattempt', async (req, res) => {
     res.send(result);
 
   } catch (error) {
-    res.json({ message: 'regestration error' });
+    console.error(error)
+    // res.json({ message: 'regestration error' });
     res.status(500).send('Error registering user');
   }
 
@@ -114,13 +143,24 @@ app.post('/loginattempt', async (req, res) => {
       res.json({ message: 'Login successful', username});
 
     } else {
-      res.status(401).send('Invalid credentials');
+      res.status(401).send('Email or password is incorrect.');
     }
   } else {
     res.status(404).send('User not found');
   }
 
 });
+
+function checkPasswordValidity(password) {
+
+  const is8Char = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  console.log("PASSWORD VALLID: ", is8Char, hasUpper, hasLower, hasNumber, "\n(", is8Char && hasUpper && hasLower && hasNumber, ")")
+
+  return is8Char && hasUpper && hasLower && hasNumber;
+}
 
 
 app.post('/forgot-password', async (req, res) => {
@@ -167,6 +207,7 @@ app.post('/forgot-password', async (req, res) => {
       });
 
       if (error) {
+        console.error(error)
         return res.status(500).json({ message: 'Failed to send reset email.' });
       }
 
@@ -181,6 +222,12 @@ app.post('/forgot-password', async (req, res) => {
 
 app.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;
+
+
+  if (!checkPasswordValidity(newPassword)) {
+    res.status(409).send('Password must be 8 characters long and contain a number, an uppercase letter and a lowercase letter.');
+    return;
+  }
 
   try {
     let query = `SELECT * FROM users WHERE reset_token_expires > ?;`;
@@ -229,7 +276,6 @@ app.post('/reset-password', async (req, res) => {
 });
 
 
-
 // Logout action
 app.post('/logout', function(req, res) {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -276,6 +322,43 @@ app.get('/api/username', authenticateJWT, async (req, res) => {
     username: req.user.username
   });
 });
+
+
+
+app.post('/api/set-password', authenticateJWT, async (req, res) => {
+  const { newPassword } = req.body;
+  let user_id = req.user.id;
+
+
+  if (!checkPasswordValidity(newPassword)) {
+    res.status(409).send('Password must be 8 characters long and contain a number, an uppercase letter and a lowercase letter.');
+    return;
+  }
+  console.log("AFTER PASS CHECK")
+  let passwordHash = await bcrypt.hash(newPassword, 10);
+
+  try {
+
+      let sql = `UPDATE users
+               SET hash = ?
+               , reset_token_hash = ?
+               , reset_token_expires = ?
+
+               WHERE row_id = ?;`;
+
+
+      const result = await db.query(sql, [passwordHash, null, null, user_id], async (err, result) => {
+        if (err) throw err;
+      });
+
+    
+    res.status(200).json({ message: 'Password has been reset successfully.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error while resetting password.' });
+  }
+});
+
+
 
 
 //#region species
@@ -624,6 +707,16 @@ app.delete('/api/character/:row_id', authenticateJWT, async (req, res) => {
 app.get('/api/background/', authenticateJWT, async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM backgrounds');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all backgrounds
+app.get('/api/sources/', authenticateJWT, async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM sources');
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });

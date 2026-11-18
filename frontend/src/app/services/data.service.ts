@@ -2,15 +2,19 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
-  Class, Subclass, Species, Subspecies, ClassFeature, SpeciesFeature,
+  Class, Subclass, Species, Subspecies, ClassFeature, SpeciesFeature, Source,
   CharacterListing, CharacterRecord, Background, CharacterPayload, CharacterDetail
 } from "../models/models"
+
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-  private apiUrl = 'http://localhost:3000/api';
+  private baseUrl = environment.apiUrl;
+  private apiUrl = `${this.baseUrl}/api`;
+
   private http = inject(HttpClient)
 
   getUsername() {
@@ -43,6 +47,11 @@ export class DataService {
 
   getClasses(): Observable<Class[]> {
     return this.http.get<Class[]>(`${this.apiUrl}/class`);
+  }
+  
+
+  getSources(): Observable<Source[]> {
+    return this.http.get<Source[]>(`${this.apiUrl}/sources`);
   }
   
   

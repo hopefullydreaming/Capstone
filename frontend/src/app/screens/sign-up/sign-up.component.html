@@ -19,13 +19,13 @@
         </div>
         <div class="flex flex-col gap-1">
             <label for="password">Password:</label>
-            <input type="text" pInputText pSize="small"
+            <input type="password" pInputText pSize="small"
                    class="w-full sm:w-96" id="password"
-                   placeholder="Enter your password"
+                   placeholder="Enter a password"
                    formControlName="password"
                    required />
         </div>
-        <!--<div class="text-red-400">{{ errorMsg() }}</div>-->
+        <div class="text-red-400">{{ errorMsg() }}</div>
         <button pButton pSize="small" type="submit" class=" w-fit">Sign Up</button>
 
     </form>
