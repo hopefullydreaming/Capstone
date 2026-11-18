@@ -179,6 +179,7 @@ export class CharacterAddComponent {
         let officialArray = this.filterForm.get("officialArray") as FormArray;
         for (let i in this.officialSources()) {
           officialArray.push(new FormControl(true));
+          this.officialChecked().push(true);
         }
 
         this.filterForm.registerControl("officialArray", officialArray)
@@ -202,6 +203,7 @@ export class CharacterAddComponent {
         let homebrewArray = this.filterForm.get("homebrewArray") as FormArray;
         for (let i in this.homebrewSources()) {
           homebrewArray.push(new FormControl(true));
+          this.homebrewChecked().push(true);
         }
 
         this.filterForm.registerControl("homebrewArray", homebrewArray)

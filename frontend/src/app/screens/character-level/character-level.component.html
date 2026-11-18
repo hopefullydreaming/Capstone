@@ -19,7 +19,7 @@
 
 
 <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 items-center mt-6">
-    @if(skillArray().controls.length > 0){
+    @if(skillArray()?.controls?.length > 0){
     <div formArrayName="skillArray" class="flex flex-col gap-4 items-center mt-6">
         <p>Background Skills</p>
         <!--@for (skillGroup of skillArray().controls; track $index) {-->
@@ -35,7 +35,7 @@
     </div>
     }
 
-    @if(expArray().controls.length > 0){
+    @if(expArray()?.controls?.length > 0){
     <div formArrayName="expArray" class="flex flex-col gap-4 items-center mt-6">
         <p>{{ expLabel() }}</p>
         <!--@for (skillGroup of expArray().controls; track $index) {-->
@@ -50,7 +50,7 @@
     </div>
     }
 
-    @if(choiceArray().controls.length > 0){
+    @if(choiceArray()?.controls?.length > 0){
     <div formArrayName="choiceArray" class="flex flex-col gap-4 items-center mt-6">
         <!--@for (choice of choiceArray().controls; track $index;) {-->
         @for (choice of choiceArray().controls; track choice; let i = $index;) {
