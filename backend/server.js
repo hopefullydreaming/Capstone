@@ -14,7 +14,8 @@ process.loadEnvFile();
 
 const app = express();
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: "https://dnd-chracter-sheet-maker.up.railway.app",
+  // origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 app.use(express.json());
