@@ -96,7 +96,7 @@ app.post('/signupattempt', async (req, res) => {
     res.cookie("SESSIONID", token, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 1000
     });
@@ -148,7 +148,7 @@ app.post('/loginattempt', async (req, res) => {
         res.cookie("SESSIONID", token, {
           httpOnly: true,
           secure: isProduction,
-          sameSite: isProduction ? 'none' : 'lax',
+          sameSite: 'lax',
           path: '/',
           maxAge: 60 * 60 * 1000
         });
@@ -299,7 +299,7 @@ app.post('/logout', function(req, res) {
   res.clearCookie('SESSIONID', {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    sameSite: 'lax',
     path: '/'
   });
 
