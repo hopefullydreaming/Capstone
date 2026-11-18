@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'capstone.railway.internal'
+  apiUrl: 'https://dnd-capstone.up.railway.app'
 };
