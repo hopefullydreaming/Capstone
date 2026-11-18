@@ -15,8 +15,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const app = express();
 app.use(cors({
-  origin: "https://dnd-chracter-sheet-maker.up.railway.app",
-  // origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 app.use(express.json());
@@ -92,7 +91,7 @@ app.post('/signupattempt', async (req, res) => {
     // Sign token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    const isProduction = false//process.env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV === 'production';
 
     res.cookie("SESSIONID", token, {
       httpOnly: true,
@@ -144,7 +143,7 @@ app.post('/loginattempt', async (req, res) => {
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-        const isProduction = false//process.env.NODE_ENV === 'production';
+        const isProduction = process.env.NODE_ENV === 'production';
 
         res.cookie("SESSIONID", token, {
           httpOnly: true,
@@ -295,7 +294,7 @@ app.post('/reset-password', async (req, res) => {
 
 // Logout action
 app.post('/logout', function(req, res) {
-  const isProduction = false//process.env.NODE_ENV === 'production';
+  const isProduction = process.env.NODE_ENV === 'production';
 
   res.clearCookie('SESSIONID', {
     httpOnly: true,
