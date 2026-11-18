@@ -1,18 +1,6 @@
 import { Routes } from '@angular/router';
-import { ProfileComponent } from './screens/profile/profile.component';
-import { ErrorPageComponent } from './screens/error-page/error-page.component';
-import { DashboardComponent } from './screens/dashboard/dashboard.component';
-import { CharacterListingComponent } from './screens/character-listing/character-listing.component';
-import { CharacterEditComponent } from './screens/character-edit/character-edit.component';
-import { LoginComponent } from './screens/login/login.component';
-import { SignUpComponent } from './screens/sign-up/sign-up.component';
-import { CharacterAddComponent } from './screens/character-add/character-add.component';
 import { AuthGuard } from './services/auth-guard';
 import { LoginGuard } from './services/login-guard';
-import { CharacterLevelComponent } from './screens/character-level/character-level.component';
-import { ResetPasswordComponent } from './screens/reset-password/reset-password.component';
-import { ForgotPasswordComponent } from './screens/forgot-password/forgot-password.component';
-
 
 export const routes: Routes = [
 
