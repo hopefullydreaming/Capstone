@@ -81,9 +81,7 @@ export class GeneratePdfService {
   async generateAccessibleBooklet(data: CharacterData) {
 
     const fontkitModule = await import('@pdf-lib/fontkit');
-    console.log("FONT KIT: ", fontkitModule)
     const fontkit = ('default' in fontkitModule ? fontkitModule.default : fontkitModule) as typeof fontkitModule;
-
 
     const sequentialDoc = await PDFDocument.create();
     sequentialDoc.registerFontkit(fontkit);
@@ -152,8 +150,6 @@ export class GeneratePdfService {
       for (let i = 0; i < pagesToAdd; i++) {
         const blankPage = sequentialDoc.addPage([this.pageW, this.pageH]);
 
-        // blankPage.drawText("page blank intentionally", { x: 200, y: 200, size: 8, font: font, color: WHITE });
-
         blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
       }
     }
@@ -164,9 +160,8 @@ export class GeneratePdfService {
       }
     }
 
-    // const cleanSequentialBytes = await sequentialDoc.save();
+    const cleanSequentialBytes = await sequentialDoc.save();
 
-    // const referenceSourceDoc = await PDFDocument.load(cleanSequentialBytes);
 
     const finalBookletDoc = await PDFDocument.create();
 
@@ -211,8 +206,8 @@ export class GeneratePdfService {
     finalBookletDoc.setTitle(`${data.name} Character Booklet`);
 
     const finalBytes = await finalBookletDoc.save();
-    // this.triggerDownload(cleanSequentialBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
-    this.triggerDownload(finalBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
+    this.triggerDownload(cleanSequentialBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
+    // this.triggerDownload(finalBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
    
   }
 
