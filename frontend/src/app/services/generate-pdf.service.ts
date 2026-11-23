@@ -142,7 +142,9 @@ export class GeneratePdfService {
       for (let i = 0; i < pagesToAdd; i++) {
         const blankPage = sequentialDoc.addPage([this.pageW, this.pageH]);
 
-        blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
+        blankPage.drawText("page blank intentionally", { x: 200, y: 200, size: 8, font: font, color: WHITE });
+
+        // blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
       }
     }
     const cleanSequentialBytes = await sequentialDoc.save();
