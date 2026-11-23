@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont } from 'pdf-lib';
+import { PDFDocument, PDFName, rgb, PDFPage, PDFFont } from 'pdf-lib';
 import { ClassFeature, SpeciesFeature, Resource } from "../models/models";
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -82,7 +82,6 @@ export class GeneratePdfService {
 
     const fontkitModule = await import('@pdf-lib/fontkit');
     console.log("FONT KIT: ", fontkitModule)
-    // const fontkit = fontkitModule.default || fontkitModule;
     const fontkit = ('default' in fontkitModule ? fontkitModule.default : fontkitModule) as typeof fontkitModule;
 
 
@@ -158,6 +157,13 @@ export class GeneratePdfService {
         blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
       }
     }
+
+    for (const page of sequentialDoc.getPages()) {
+      if (!page.node.has(PDFName.of('Contents'))) {
+        page.drawRectangle({ x: 0, y: 0, width: 1, height: 1, color: WHITE, opacity: 0 });
+      }
+    }
+
     // const cleanSequentialBytes = await sequentialDoc.save();
 
     // const referenceSourceDoc = await PDFDocument.load(cleanSequentialBytes);
