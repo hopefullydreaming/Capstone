@@ -204,7 +204,8 @@ export class GeneratePdfService {
     finalBookletDoc.setTitle(`${data.name} Character Booklet`);
 
     const finalBytes = await finalBookletDoc.save();
-    this.triggerDownload(finalBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
+    this.triggerDownload(cleanSequentialBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
+    // this.triggerDownload(finalBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
    
   }
 
