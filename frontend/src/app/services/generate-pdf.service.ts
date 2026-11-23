@@ -81,6 +81,7 @@ export class GeneratePdfService {
   async generateAccessibleBooklet(data: CharacterData) {
 
     const fontkitModule = await import('@pdf-lib/fontkit');
+    console.log("FONT KIT: ", fontkitModule)
     // const fontkit = fontkitModule.default || fontkitModule;
     const fontkit = ('default' in fontkitModule ? fontkitModule.default : fontkitModule) as typeof fontkitModule;
 
@@ -92,7 +93,6 @@ export class GeneratePdfService {
     const fontUrl = new URL('fonts/Quivira.otf', document.baseURI).toString();
     const fontRes = await fetch(fontUrl);
     if (!fontRes.ok) {
-      console.error(`Font failed to load: ${fontRes.status}`);
       throw new Error(`Font failed to load: ${fontRes.status}`);
     }
     const fontBytes = await fontRes.arrayBuffer();
