@@ -29,20 +29,9 @@ export interface CharacterData {
   species_features: SpeciesFeature[];
 }
 
-const BLUE = rgb(0, 0, 0);
-const RED = rgb(0, 0, 0);
-const PURPLE = rgb(0, 0, 0);
 const GRAY = rgb(0.6, 0.6, 0.6);
 const BLACK = rgb(0, 0, 0);
-const WHITE = rgb(1,1,1);
-
-// const BLUE = rgb(0.2, 0.5, 0.8);
-// const RED = rgb(0.8, 0.5, 0.6);
-// const PURPLE = rgb(0.5, 0.3, 0.7);
-// const GRAY = rgb(0.6, 0.6, 0.6);
-// const BLACK = rgb(0, 0, 0);
-
-
+const WHITE = rgb(1, 1, 1);
 
 @Injectable({
   providedIn: 'root'
@@ -86,7 +75,6 @@ export class GeneratePdfService {
     const sequentialDoc = await PDFDocument.create();
     sequentialDoc.registerFontkit(fontkit);
 
-
     const fontUrl = new URL('fonts/Quivira.otf', document.baseURI).toString();
     const fontRes = await fetch(fontUrl);
     if (!fontRes.ok) {
@@ -94,16 +82,6 @@ export class GeneratePdfService {
     }
     const fontBytes = await fontRes.arrayBuffer();
     const font = await sequentialDoc.embedFont(fontBytes);
-
-
-    // const fontBytes = await firstValueFrom(
-    //   this.http.get('fonts/Quivira.otf', { responseType: 'arraybuffer' })
-    // );
-
-    // const font = await sequentialDoc.embedFont(fontBytes, { subset: false });
-
-
-    // const font = await sequentialDoc.embedFont(StandardFonts.Helvetica);
 
     sequentialDoc.setTitle(`${data.name} Character Pages`);
 
@@ -124,15 +102,11 @@ export class GeneratePdfService {
     data.class_features.forEach(f => {
 
       let featureData = JSON.parse(f.data) ?? null;
-
       if (!!featureData.print) {
-
         let choice = data.choices[featureData.choice.id] ?? "NOT FOUND"
-
         let desc = featureData.choice.options.find((s: any) => {
-            return s.name === choice
-          })
-
+          return s.name === choice
+        }) ?? { desc: "NOT FOUND" }
         featuresArray.push({ name: f.name, description: `${featureData.print}\n${choice}. ${desc?.desc ?? 'no desc'}` });
       }
       else {
@@ -162,7 +136,6 @@ export class GeneratePdfService {
 
     const cleanSequentialBytes = await sequentialDoc.save();
 
-
     const finalBookletDoc = await PDFDocument.create();
 
     const sheetW = 792;
@@ -173,14 +146,13 @@ export class GeneratePdfService {
 
     let pageOrder: [number, number][] = [];
 
-    for (let i = 0; i < numSheets; i++){
-      pageOrder.push([(4 * i) + 4, (4*i)+1]);
+    for (let i = 0; i < numSheets; i++) {
+      pageOrder.push([(4 * i) + 4, (4 * i) + 1]);
       pageOrder.push([(4 * i) + 2, (4 * i) + 3]);
     }
-    
+
     const embeddedPages = await finalBookletDoc.embedPdf(
       cleanSequentialBytes,
-      // sequentialDoc,
       Array.from({ length: totalPages }, (_, idx) => idx)
     );
 
@@ -193,23 +165,11 @@ export class GeneratePdfService {
       sheet.drawPage(embeddedRight, { x: this.pageW + 30, y: 0, width: this.pageW, height: this.pageH });
     }
 
-    // for (const [leftPageNum, rightPageNum] of pageOrder) {
-    //   const sheet = finalBookletDoc.addPage([sheetW, sheetH]);
-
-    //   const [embeddedLeft] = await finalBookletDoc.embedPdf(cleanSequentialBytes, [leftPageNum - 1]);
-    //   const [embeddedRight] = await finalBookletDoc.embedPdf(cleanSequentialBytes, [rightPageNum - 1]);
-
-    //   sheet.drawPage(embeddedLeft, { x: 0, y: 0, width: this.pageW, height: this.pageH });
-    //   sheet.drawPage(embeddedRight, { x: this.pageW + 30, y: 0, width: this.pageW, height: this.pageH });
-
-    // }
-
     finalBookletDoc.setTitle(`${data.name} Character Booklet`);
 
     const finalBytes = await finalBookletDoc.save();
-    // this.triggerDownload(cleanSequentialBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
     this.triggerDownload(finalBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
-   
+
   }
 
   drawPage1(page: PDFPage, font: PDFFont, data: CharacterData) {
@@ -222,9 +182,9 @@ export class GeneratePdfService {
 
     this.drawSkillsGrid(page, this.margin, currentY, font, data);
 
-    currentY -= (23 + data.senses.length)* 16
+    currentY -= (23 + data.senses.length) * 16
 
-    this.drawProficienciesGrid(page, this.margin, currentY, font, data) 
+    this.drawProficienciesGrid(page, this.margin, currentY, font, data)
 
   }
 
@@ -244,27 +204,26 @@ export class GeneratePdfService {
     const saveY = y - boxH;
 
     const statObjs = [
-      {l: "STR", id: "strength", val: stats.str},
-      {l: "DEX", id: "dexterity", val: stats.dex},
-      {l: "CON", id: "constitution", val: stats.con},
-      {l: "INT", id: "intelligence", val: stats.int},
-      {l: "WIS", id: "wisdom", val: stats.wis},
-      {l: "CHA", id: "charisma", val: stats.cha}
+      { l: "STR", id: "strength", val: stats.str },
+      { l: "DEX", id: "dexterity", val: stats.dex },
+      { l: "CON", id: "constitution", val: stats.con },
+      { l: "INT", id: "intelligence", val: stats.int },
+      { l: "WIS", id: "wisdom", val: stats.wis },
+      { l: "CHA", id: "charisma", val: stats.cha }
     ]
 
 
-    page.drawRectangle({ x: x, y: y - (boxH + saveH), width: this.contentWidth, height: boxH + saveH, borderColor: BLUE, borderWidth: 2 });
+    page.drawRectangle({ x: x, y: y - (boxH + saveH), width: this.contentWidth, height: boxH + saveH, borderColor: BLACK, borderWidth: 2 });
 
     statObjs.forEach((label, idx) => {
       const startX = x + (idx * colW);
 
       // Box Path
-      page.drawRectangle({ x: startX, y: y - boxH, width: colW, height: boxH, borderColor: BLUE, borderWidth: 0.75 });
+      page.drawRectangle({ x: startX, y: y - boxH, width: colW, height: boxH, borderColor: BLACK, borderWidth: 0.75 });
 
       // Header Text String
-
       let labelX = this.centerText(label.l, colW, labelSize, font);
-      page.drawText(label.l, { x: startX + labelX, y: y - 14, size: labelSize, font: font, color: BLUE });
+      page.drawText(label.l, { x: startX + labelX, y: y - 14, size: labelSize, font: font });
 
       // Value Value Modifier Number
       const val = label.val;
@@ -286,20 +245,16 @@ export class GeneratePdfService {
     statObjs.forEach((label, idx) => {
       const startX = x + (idx * colW);
 
-      page.drawRectangle({ x: startX, y: saveY - saveH, width: colW, height: saveH, borderColor: BLUE, borderWidth: 0.75 });
+      page.drawRectangle({ x: startX, y: saveY - saveH, width: colW, height: saveH, borderColor: BLACK, borderWidth: 0.75 });
 
       let radioSymbol = this.getProfDisplay(label.id, null, saves);
-
       let modText = `${radioSymbol} Save: ${this.displayModifier(label.id, stats, charData.level, null, saves)}`
-
       let modX = this.centerText(modText, colW, saveSize, font);
 
       page.drawText(modText, { x: startX + modX, y: saveY - 14, size: saveSize, font: font });
 
     });
   }
-
-
 
   /** Native Vector Grid Drawer for Table B Vitals Panel */
   private drawCoreVitalsGrid(page: PDFPage, x: number, y: number, font: PDFFont, data: CharacterData) {
@@ -313,9 +268,9 @@ export class GeneratePdfService {
       { l: 'Initiative', w: 2 },
       { l: 'Speed', w: 2 },
       { l: 'Current HP', w: 6 }
-    ],[
+    ], [
       { l: 'Hit Dice', w: 3 },
-      { l: 'Max HP', w: 3},
+      { l: 'Max HP', w: 3 },
       { l: 'Temp HP', w: 2 },
       { l: 'Death Saves', w: 4 }
     ]];
@@ -325,7 +280,7 @@ export class GeneratePdfService {
     let spacing = 1;
 
 
-    page.drawRectangle({ x: x, y: y - (boxH * 2), width: width, height: boxH * 2, borderColor: PURPLE, borderWidth: 2 });
+    page.drawRectangle({ x: x, y: y - (boxH * 2), width: width, height: boxH * 2, borderColor: BLACK, borderWidth: 2 });
 
     indicators.forEach((indArr, idx) => {
       let startY = y - (boxH * idx);
@@ -336,8 +291,8 @@ export class GeneratePdfService {
 
         let labelX = this.centerText(ind.l, colW * ind.w, labelSize, font);
 
-        page.drawRectangle({ x: startX, y: startY - boxH, width: colW * ind.w, height: boxH, borderColor: PURPLE, borderWidth: 0.75 });
-        page.drawText(ind.l, { x: startX + labelX, y: textY - (labelSize * spacing), size: labelSize, font: font, color: PURPLE });
+        page.drawRectangle({ x: startX, y: startY - boxH, width: colW * ind.w, height: boxH, borderColor: BLACK, borderWidth: 0.75 });
+        page.drawText(ind.l, { x: startX + labelX, y: textY - (labelSize * spacing), size: labelSize, font: font });
         startX += (colW * ind.w);
       });
     });
@@ -347,15 +302,15 @@ export class GeneratePdfService {
       let startX = x;
 
       indArr.forEach(ind => {
-        switch(ind.l){
-          case "AC":{
+        switch (ind.l) {
+          case "AC": {
             let indText = `${data.ac}`
             let valueX = this.centerText(indText, colW * ind.w, valueSize, font);
             page.drawText(indText, { x: startX + valueX, y: startY - ((labelSize * spacing) + valueSize), size: valueSize, font: font });
             break;
           }
           case "Initiative": {
-            let dexMod = Math.floor((data.stats.dex -10)/2)
+            let dexMod = Math.floor((data.stats.dex - 10) / 2)
             let indText = `${dexMod >= 0 ? "+" : ""}${dexMod}`
             let valueX = this.centerText(indText, colW * ind.w, valueSize, font);
             page.drawText(indText, { x: startX + valueX, y: startY - ((labelSize * spacing) + valueSize), size: valueSize, font: font });
@@ -396,8 +351,8 @@ export class GeneratePdfService {
           }
           case "Death Saves": {
             let width = colW * ind.w;
-            let width1 = width * (2/5);
-            let width2 = width * (3/5);
+            let width1 = width * (2 / 5);
+            let width2 = width * (3 / 5);
             let saveSize = 13;
             let passText = `Pass`
             let failText = `Fail`
@@ -407,11 +362,11 @@ export class GeneratePdfService {
             let passX = this.centerText(passText, width1, saveSize, font);
             let failX = this.centerText(failText, width1, saveSize, font);
 
-            page.drawText(passText, { x: startX + passX, y: startY - ((labelSize * spacing)+ saveSize), size: saveSize, font: font });
-            page.drawText(failText, { x: startX + failX, y: startY - ((labelSize * spacing) + saveSize*2.1), size: saveSize, font: font });
+            page.drawText(passText, { x: startX + passX, y: startY - ((labelSize * spacing) + saveSize), size: saveSize, font: font });
+            page.drawText(failText, { x: startX + failX, y: startY - ((labelSize * spacing) + saveSize * 2.1), size: saveSize, font: font });
 
             page.drawText(indText, { x: startX + valueX + width1, y: startY - ((labelSize * spacing) + saveSize), size: saveSize, font: font });
-            page.drawText(indText, { x: startX + valueX + width1, y: startY - ((labelSize * spacing) + saveSize*2.1), size: saveSize, font: font });
+            page.drawText(indText, { x: startX + valueX + width1, y: startY - ((labelSize * spacing) + saveSize * 2.1), size: saveSize, font: font });
             break;
           }
         }
@@ -427,10 +382,7 @@ export class GeneratePdfService {
     let currentY = y - (boxH * 2);
     let resourceH = rowH * (resources.length + 2);
 
-    page.drawRectangle({ x: x, y: currentY - (resourceH), width: width, height: resourceH, borderColor: PURPLE, borderWidth: 2 });
-
-
-
+    page.drawRectangle({ x: x, y: currentY - (resourceH), width: width, height: resourceH, borderColor: BLACK, borderWidth: 2 });
 
     let resourcesLabel = "Resources";
 
@@ -443,13 +395,13 @@ export class GeneratePdfService {
     currentY = currentY - rowH;
 
     // Draw structural cell frame boundaries ◎◐●◉
-    page.drawRectangle({ x: startX, y: currentY - rowH, width: colW * 7, height: rowH, borderColor: RED, borderWidth: 0.5 });
-    page.drawRectangle({ x: startX + colW * 7, y: currentY - rowH, width: colW * 2, height: rowH, borderColor: RED, borderWidth: 0.5 });
-    page.drawRectangle({ x: startX + colW * 9, y: currentY - rowH, width: colW * 3, height: rowH, borderColor: RED, borderWidth: 0.5 });
+    page.drawRectangle({ x: startX, y: currentY - rowH, width: colW * 7, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
+    page.drawRectangle({ x: startX + colW * 7, y: currentY - rowH, width: colW * 2, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
+    page.drawRectangle({ x: startX + colW * 9, y: currentY - rowH, width: colW * 3, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
 
 
-    let usesX = this.centerText("Uses", colW*2, 10, font);
-    let rechargeX = this.centerText("Recharge", colW*3, 10, font);
+    let usesX = this.centerText("Uses", colW * 2, 10, font);
+    let rechargeX = this.centerText("Recharge", colW * 3, 10, font);
 
 
     page.drawText("Name", { x: startX + 5, y: currentY - 11, size: 10, font: font });
@@ -461,11 +413,11 @@ export class GeneratePdfService {
     resources.forEach((resource, idx) => {
 
 
-      page.drawRectangle({ x: startX, y: currentY - rowH, width: colW*7, height: rowH, borderColor: RED, borderWidth: 0.5 });
+      page.drawRectangle({ x: startX, y: currentY - rowH, width: colW * 7, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
       page.drawText(resource.name, { x: startX + 5, y: currentY - 11, size: 8, font: font });
 
 
-      page.drawRectangle({ x: startX + colW * 7, y: currentY - rowH, width: colW * 2, height: rowH, borderColor: RED, borderWidth: 0.5 });
+      page.drawRectangle({ x: startX + colW * 7, y: currentY - rowH, width: colW * 2, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
 
       if (resource.max_value > 0) {
         let spacing = resource.max_value < 10 ? "  " : resource.max_value < 100 ? " " : "";
@@ -490,13 +442,13 @@ export class GeneratePdfService {
       }
 
 
-      page.drawRectangle({ x: startX + colW * 9, y: currentY - rowH, width: colW * 3, height: rowH, borderColor: RED, borderWidth: 0.5 });
+      page.drawRectangle({ x: startX + colW * 9, y: currentY - rowH, width: colW * 3, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
 
       let rechargeText = resource.recharge === "long" ? "Long Rest" : resource.recharge === "short" ? "Short Rest" : resource.recharge;
 
       let valueX = this.centerText(rechargeText, colW * 3, 8, font);
 
-      page.drawText(rechargeText, { x: startX + valueX + (colW*9), y: currentY - 11, size: 8, font: font });
+      page.drawText(rechargeText, { x: startX + valueX + (colW * 9), y: currentY - 11, size: 8, font: font });
 
       currentY = currentY - rowH;
 
@@ -509,10 +461,10 @@ export class GeneratePdfService {
 
     let equipH = rowH * (16 - data.resources.length + data.senses.length)
 
-    page.drawRectangle({ x: x, y: currentY - equipH, width: width, height: equipH, borderColor: PURPLE, borderWidth: 2 });
+    page.drawRectangle({ x: x, y: currentY - equipH, width: width, height: equipH, borderColor: BLACK, borderWidth: 2 });
 
 
-    page.drawRectangle({ x: x, y: currentY - rowH, width: width, height: rowH, borderColor: PURPLE, borderWidth: 0.5 });
+    page.drawRectangle({ x: x, y: currentY - rowH, width: width, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
 
     page.drawText(equipmentLabel, { x: x + equipX, y: currentY - 12, size: 10, font: font });
 
@@ -525,35 +477,30 @@ export class GeneratePdfService {
       const startX = x + (idx * (colW * 3));
 
       // Box Path
-      page.drawRectangle({ x: startX, y: currentY - (rowH *2), width: (colW * 3), height: rowH*2, borderColor: BLUE, borderWidth: 0.75 });
+      page.drawRectangle({ x: startX, y: currentY - (rowH * 2), width: (colW * 3), height: rowH * 2, borderColor: BLACK, borderWidth: 0.75 });
 
       // Header Text String
 
       let labelX = this.centerText(label, (colW * 3), labelSize, font);
-      page.drawText(label, { x: startX + labelX, y: currentY - 28, size: labelSize, font: font, color: BLUE });
+      page.drawText(label, { x: startX + labelX, y: currentY - 28, size: labelSize, font: font });
 
     });
 
 
-    currentY = currentY - (rowH*2);
+    currentY = currentY - (rowH * 2);
 
-    for (let i = 0; i < (13 - data.resources.length + data.senses.length); i++){
+    for (let i = 0; i < (13 - data.resources.length + data.senses.length); i++) {
 
-      page.drawRectangle({ x: x, y: currentY - rowH, width: width, height: rowH, borderColor: PURPLE, borderWidth: 0.5 });
+      page.drawRectangle({ x: x, y: currentY - rowH, width: width, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
 
       currentY = currentY - rowH;
     }
 
-
-
   }
 
   private centerText(text: string, boxW: number, size: number, font: PDFFont): number {
-
     const textWidth = font.widthOfTextAtSize(text, size);
-
     return (boxW / 2) - (textWidth / 2);
-
   }
 
   /** Native Vector Grid Drawer for Table C Skills Checklist Matrix */
@@ -572,12 +519,10 @@ export class GeneratePdfService {
     let labelX = this.centerText(skillsLabel, colW, 8, font);
 
 
-    page.drawRectangle({ x: x, y: startY - rowH, width: colW, height: rowH, borderColor: RED, borderWidth: 0.5 });
-    page.drawRectangle({ x: x, y: startY - (rowH * 19), width: colW, height: rowH * 19, borderColor: RED, borderWidth: 2 });
+    page.drawRectangle({ x: x, y: startY - rowH, width: colW, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
+    page.drawRectangle({ x: x, y: startY - (rowH * 19), width: colW, height: rowH * 19, borderColor: BLACK, borderWidth: 2 });
 
     page.drawText(skillsLabel, { x: x + labelX, y: startY - 12, size: 10, font: font });
-
-
 
     this.skillList.forEach((skill, idx) => {
 
@@ -585,13 +530,13 @@ export class GeneratePdfService {
       startY = startY - rowH;
 
       // Draw structural cell frame boundaries ◎◐●◉
-      page.drawRectangle({ x: startX, y: startY - rowH, width: colW, height: rowH, borderColor: RED, borderWidth: 0.5 });
+      page.drawRectangle({ x: startX, y: startY - rowH, width: colW, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
 
       // Simulated Checkbox Icon / Trained Indicator Marker
-      let radioSymbol =this.getProfDisplay(skill.id, skills, null);// = skill.trained ? '◐' : '●';
+      let radioSymbol = this.getProfDisplay(skill.id, skills, null);// = skill.trained ? '◐' : '●';
 
       // const radioSymbol = skill.trained ? '◉' : '◎';
-      page.drawText(radioSymbol, { x: startX + 5, y: startY - 12, size: 10, font: font, color: RED });
+      page.drawText(radioSymbol, { x: startX + 5, y: startY - 12, size: 10, font: font });
 
       let skillBonus = this.displayModifier(skill.id, stats, level, skills, null)
 
@@ -602,13 +547,10 @@ export class GeneratePdfService {
       page.drawText(skill.label, { x: startX + 40, y: startY - 11, size: 8, font: font });
     });
 
-
-
     startY = startY - rowH;
     let sensesLabel = "Senses";
 
     let sensexLabelX = this.centerText(sensesLabel, colW, 8, font);
-
 
     let sensesList = [
       { label: "Passive Perception", value: `${this.getNumberModifier('perception', stats, level, skills) + 10}`, size: 10 },
@@ -617,25 +559,24 @@ export class GeneratePdfService {
     ]
 
     charData.senses.forEach(s => {
-      sensesList.push({label: s.name, value: s.value, size: 8})
+      sensesList.push({ label: s.name, value: s.value, size: 8 })
     })
 
-    page.drawRectangle({ x: x, y: startY - rowH, width: colW, height: rowH, borderColor: RED, borderWidth: 0.5 });
-    page.drawRectangle({ x: x, y: startY - (rowH * (sensesList.length + 1)), width: colW, height: rowH * (sensesList.length + 1), borderColor: RED, borderWidth: 2 });
+    page.drawRectangle({ x: x, y: startY - rowH, width: colW, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
+    page.drawRectangle({ x: x, y: startY - (rowH * (sensesList.length + 1)), width: colW, height: rowH * (sensesList.length + 1), borderColor: BLACK, borderWidth: 2 });
 
     page.drawText(sensesLabel, { x: x + sensexLabelX, y: startY - 12, size: 10, font: font });
 
-
-    sensesList.forEach((sense, idx) => {
+    sensesList.forEach((sense) => {
 
       const startX = x;
       startY = startY - rowH;
 
       // Draw structural cell frame boundaries ◎◐●◉
-      page.drawRectangle({ x: startX, y: startY - rowH, width: colW, height: rowH, borderColor: RED, borderWidth: 0.5 });
+      page.drawRectangle({ x: startX, y: startY - rowH, width: colW, height: rowH, borderColor: BLACK, borderWidth: 0.5 });
 
       // sense label
-      page.drawText(sense.label, { x: startX + 5, y: startY - 11, size: 8, font: font, color: RED });
+      page.drawText(sense.label, { x: startX + 5, y: startY - 11, size: 8, font: font });
 
 
       let labelX = this.centerText(sense.value, 24, sense.size, font);
@@ -659,17 +600,14 @@ export class GeneratePdfService {
 
 
 
-    page.drawRectangle({ x: x, y: startY - h, width: colW, height: h, borderColor: RED, borderWidth: 2 });
+    page.drawRectangle({ x: x, y: startY - h, width: colW, height: h, borderColor: BLACK, borderWidth: 2 });
 
     page.drawText(skillsLabel, { x: x + 5, y: startY - 16, size: 12, font: font });
 
     // placeholder
     let profs = "Vivamus a urna imperdiet, bibendum turpis eu, vestibulum nibh. Sed eget libero diam. Praesent eget felis ut urna tempor auctor sit amet ac turpis. Praesent eget felis ut urna tempor auctor sit amet ac turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
-
-    this.multiLineText(page, font, profs, startY-32, 10, 12, colW - 10)
-
-
+    this.multiLineText(page, font, profs, startY - 32, 10, 12, colW - 10)
 
   }
 
@@ -791,46 +729,31 @@ export class GeneratePdfService {
 
     const colW = this.contentWidth - 10;
 
-
-
     let startY = 587;
     let bgNameText = `Background Feature: ${charData.background_feature_name}`;
 
     page.drawText(bgNameText, { x: this.margin + 5, y: startY - (titleSize + 5), size: titleSize, font: font });
 
     let currentY = 553;
-
-
     currentY = this.multiLineText(page, font, charData.background_feature, currentY, fontSize, lineHeight, colW)
 
-
     let bgHeight = startY - currentY;
-
-
-    page.drawRectangle({ x: this.margin, y: startY - bgHeight, width: this.contentWidth, height: bgHeight, borderColor: BLUE, borderWidth: 2 });
-
-
+    page.drawRectangle({ x: this.margin, y: startY - bgHeight, width: this.contentWidth, height: bgHeight, borderColor: BLACK, borderWidth: 2 });
 
     page.drawText("Inventory", { x: this.margin + 5, y: currentY - (titleSize + 3), size: titleSize, font: font });
 
-    page.drawRectangle({ x: this.margin, y: currentY - 20, width: this.contentWidth, height: 20, borderColor: BLUE, borderWidth: 2 });
+    page.drawRectangle({ x: this.margin, y: currentY - 20, width: this.contentWidth, height: 20, borderColor: BLACK, borderWidth: 2 });
 
-    let rows = Math.floor((currentY - 55)/16);
-
+    let rows = Math.floor((currentY - 55) / 16);
 
     currentY -= 20;
 
-
     for (let i = 0; i < rows; i++) {
-
-      page.drawRectangle({ x: this.margin, y: currentY - 16, width: this.contentWidth, height: 16, borderColor: BLUE, borderWidth: 0.5 });
+      page.drawRectangle({ x: this.margin, y: currentY - 16, width: this.contentWidth, height: 16, borderColor: BLACK, borderWidth: 0.5 });
       currentY -= 16;
-
     }
 
-
-    page.drawRectangle({ x: this.margin, y: currentY, width: this.contentWidth, height: 16*rows, borderColor: BLUE, borderWidth: 2 });
-
+    page.drawRectangle({ x: this.margin, y: currentY, width: this.contentWidth, height: 16 * rows, borderColor: BLACK, borderWidth: 2 });
 
   }
 
@@ -868,7 +791,7 @@ export class GeneratePdfService {
   }
 
 
-  private paginateLongText(doc: PDFDocument, features: Array<{name: string, description: string}>, font: PDFFont) {
+  private paginateLongText(doc: PDFDocument, features: Array<{ name: string, description: string }>, font: PDFFont) {
     const fontSize = 10;
     const nameSize = 12;
     const lineHeight = 12;
@@ -877,69 +800,71 @@ export class GeneratePdfService {
     let currentPage = doc.addPage([this.pageW, this.pageH]);
     let currentY = 580;
 
-    currentPage.drawText('Features and Traits', { x: this.margin, y: currentY-2, size: 14, font: font });
+    currentPage.drawText('Features and Traits', { x: this.margin, y: currentY - 2, size: 14, font: font });
     currentY -= 24;
 
-    features.forEach((f) => { 
+    features.forEach((f, i) => {
 
-      if (currentY - (lineHeight*3) < bottomLimit) {
+      if (currentY - (lineHeight * 3) < bottomLimit) {
         currentPage = doc.addPage([this.pageW, this.pageH]);
         currentY = 580;
       }
 
       currentPage.drawText(f.name, { x: this.margin, y: currentY, size: nameSize, font });
-      currentY -= lineHeight+2;
+      currentY -= lineHeight + 2;
 
 
-    const paragraphs = f.description.split('\n');
+      const paragraphs = f.description.split('\n');
 
-    paragraphs.forEach((para) => {
-      if (!para.trim()) {
-        return;
-      }
+      paragraphs.forEach((para) => {
+        para = para.trim();
+        if (!para.trim()) {
+          return;
+        }
 
-      let width = this.contentWidth;
-      let x = this.margin;
+        let width = this.contentWidth;
+        let x = this.margin;
 
 
-      if (para.startsWith("\\t")) {
-        para = para.slice(2)
-        para = `• ${para}`
-        width -= this.margin/2;
-        x += this.margin/2;
-      }
+        if (para.startsWith("\\t")) {
+          para = para.slice(2)
+          para = `• ${para}`
+          width -= this.margin / 2;
+          x += this.margin / 2;
+        }
 
-      const words = para.split(' ');
-      let currentLine = '';
+        const words = para.split(' ');
+        let currentLine = '';
 
-      for (let i = 0; i < words.length; i++) {
-        const testLine = currentLine ? `${currentLine} ${words[i]}` : words[i];
-        const textWidth = font.widthOfTextAtSize(testLine, fontSize);
+        for (let i = 0; i < words.length; i++) {
+          const testLine = currentLine ? `${currentLine} ${words[i]}` : words[i];
+          const textWidth = font.widthOfTextAtSize(testLine, fontSize);
 
-        if (textWidth > width) {
+          if (textWidth > width) {
+            currentPage.drawText(currentLine, { x: x, y: currentY, size: fontSize, font });
+            currentY -= lineHeight;
+
+            if (currentY < bottomLimit) {
+              currentPage = doc.addPage([this.pageW, this.pageH]);
+              currentY = 580;
+            }
+            currentLine = words[i];
+          } else {
+            currentLine = testLine;
+          }
+        }
+
+        if (currentLine) {
           currentPage.drawText(currentLine, { x: x, y: currentY, size: fontSize, font });
           currentY -= lineHeight;
-
-          if (currentY < bottomLimit) {
+          if (currentY < bottomLimit && i !== features.length -1) {
             currentPage = doc.addPage([this.pageW, this.pageH]);
             currentY = 580;
           }
-          currentLine = words[i];
-        } else {
-          currentLine = testLine;
         }
-      }
+        currentY -= 6;
+      });
 
-      if (currentLine) {
-        currentPage.drawText(currentLine, { x: x, y: currentY, size: fontSize, font });
-        currentY -= lineHeight;
-        if (currentY < bottomLimit) {
-          currentPage = doc.addPage([this.pageW, this.pageH]);
-          currentY = 580;
-        }
-      }
-      currentY -= 6;
-    });
     });
   }
 
