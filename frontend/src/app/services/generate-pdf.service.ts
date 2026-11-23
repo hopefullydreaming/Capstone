@@ -92,6 +92,7 @@ export class GeneratePdfService {
     const fontUrl = new URL('fonts/Quivira.otf', document.baseURI).toString();
     const fontRes = await fetch(fontUrl);
     if (!fontRes.ok) {
+      console.error(`Font failed to load: ${fontRes.status}`);
       throw new Error(`Font failed to load: ${fontRes.status}`);
     }
     const fontBytes = await fontRes.arrayBuffer();
@@ -157,7 +158,7 @@ export class GeneratePdfService {
         blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
       }
     }
-    const cleanSequentialBytes = await sequentialDoc.save();
+    // const cleanSequentialBytes = await sequentialDoc.save();
 
     // const referenceSourceDoc = await PDFDocument.load(cleanSequentialBytes);
 
@@ -169,7 +170,7 @@ export class GeneratePdfService {
     const totalPages = sequentialDoc.getPageCount();
     const numSheets = totalPages / 4;
 
-    let pageOrder = [];
+    let pageOrder: [number, number][] = [];
 
     for (let i = 0; i < numSheets; i++){
       pageOrder.push([(4 * i) + 4, (4*i)+1]);
@@ -204,8 +205,8 @@ export class GeneratePdfService {
     finalBookletDoc.setTitle(`${data.name} Character Booklet`);
 
     const finalBytes = await finalBookletDoc.save();
-    this.triggerDownload(cleanSequentialBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
-    // this.triggerDownload(finalBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
+    // this.triggerDownload(cleanSequentialBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
+    this.triggerDownload(finalBytes, `${data.name} Level ${data.level} ${data.class_name} Character Booklet`);
    
   }
 
