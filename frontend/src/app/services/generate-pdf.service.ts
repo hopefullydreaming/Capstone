@@ -88,11 +88,14 @@ export class GeneratePdfService {
     const sequentialDoc = await PDFDocument.create();
     sequentialDoc.registerFontkit(fontkit);
 
-    const fontBytes = await firstValueFrom(
-      this.http.get('fonts/Quivira.otf', { responseType: 'arraybuffer' })
-    );
+    // const fontBytes = await firstValueFrom(
+    //   this.http.get('fonts/Quivira.otf', { responseType: 'arraybuffer' })
+    // );
 
-    const font = await sequentialDoc.embedFont(fontBytes, { subset: false });
+    // const font = await sequentialDoc.embedFont(fontBytes, { subset: false });
+
+
+    const font = await sequentialDoc.embedFont(StandardFonts.Helvetica);
 
     sequentialDoc.setTitle(`${data.name} Character Pages`);
 
