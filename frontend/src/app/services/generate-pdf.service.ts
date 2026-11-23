@@ -88,11 +88,21 @@ export class GeneratePdfService {
     const sequentialDoc = await PDFDocument.create();
     sequentialDoc.registerFontkit(fontkit);
 
-    const fontBytes = await firstValueFrom(
-      this.http.get('fonts/Quivira.otf', { responseType: 'arraybuffer' })
-    );
 
-    const font = await sequentialDoc.embedFont(fontBytes, { subset: false });
+    const fontUrl = new URL('fonts/Quivira.otf', document.baseURI).toString();
+    const fontRes = await fetch(fontUrl);
+    if (!fontRes.ok) {
+      throw new Error(`Font failed to load: ${fontRes.status}`);
+    }
+    const fontBytes = await fontRes.arrayBuffer();
+    const font = await sequentialDoc.embedFont(fontBytes);
+
+
+    // const fontBytes = await firstValueFrom(
+    //   this.http.get('fonts/Quivira.otf', { responseType: 'arraybuffer' })
+    // );
+
+    // const font = await sequentialDoc.embedFont(fontBytes, { subset: false });
 
 
     // const font = await sequentialDoc.embedFont(StandardFonts.Helvetica);
@@ -142,21 +152,22 @@ export class GeneratePdfService {
       for (let i = 0; i < pagesToAdd; i++) {
         const blankPage = sequentialDoc.addPage([this.pageW, this.pageH]);
 
-        blankPage.drawText("page blank intentionally", { x: 200, y: 200, size: 8, font: font, color: WHITE });
+        // blankPage.drawText("page blank intentionally", { x: 200, y: 200, size: 8, font: font, color: WHITE });
 
-        // blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
+        blankPage.drawRectangle({ x: 20, y: 20, width: 1, height: 1, borderColor: WHITE, borderWidth: 2 });
       }
     }
     const cleanSequentialBytes = await sequentialDoc.save();
 
-    const referenceSourceDoc = await PDFDocument.load(cleanSequentialBytes);
+    // const referenceSourceDoc = await PDFDocument.load(cleanSequentialBytes);
 
     const finalBookletDoc = await PDFDocument.create();
 
     const sheetW = 792;
     const sheetH = 612;
 
-    let numSheets = sequentialDoc.getPageCount()/4
+    const totalPages = sequentialDoc.getPageCount();
+    const numSheets = totalPages / 4;
 
     let pageOrder = [];
 
@@ -165,24 +176,30 @@ export class GeneratePdfService {
       pageOrder.push([(4 * i) + 2, (4 * i) + 3]);
     }
     
-
+    const embeddedPages = await finalBookletDoc.embedPdf(
+      sequentialDoc,
+      Array.from({ length: totalPages }, (_, idx) => idx)
+    );
 
     for (const [leftPageNum, rightPageNum] of pageOrder) {
       const sheet = finalBookletDoc.addPage([sheetW, sheetH]);
-
-      const [embeddedLeft] = await finalBookletDoc.embedPdf(cleanSequentialBytes, [leftPageNum - 1]);
-      const [embeddedRight] = await finalBookletDoc.embedPdf(cleanSequentialBytes, [rightPageNum - 1]);
+      const embeddedLeft = embeddedPages[leftPageNum - 1];
+      const embeddedRight = embeddedPages[rightPageNum - 1];
 
       sheet.drawPage(embeddedLeft, { x: 0, y: 0, width: this.pageW, height: this.pageH });
       sheet.drawPage(embeddedRight, { x: this.pageW + 30, y: 0, width: this.pageW, height: this.pageH });
-
-      // sheet.drawLine({
-      //   start: { x: this.pageW, y: 0 },
-      //   end: { x: this.pageW, y: sheetH },
-      //   thickness: 0.5,
-      //   color: rgb(0.85, 0.85, 0.85)
-      // });
     }
+
+    // for (const [leftPageNum, rightPageNum] of pageOrder) {
+    //   const sheet = finalBookletDoc.addPage([sheetW, sheetH]);
+
+    //   const [embeddedLeft] = await finalBookletDoc.embedPdf(cleanSequentialBytes, [leftPageNum - 1]);
+    //   const [embeddedRight] = await finalBookletDoc.embedPdf(cleanSequentialBytes, [rightPageNum - 1]);
+
+    //   sheet.drawPage(embeddedLeft, { x: 0, y: 0, width: this.pageW, height: this.pageH });
+    //   sheet.drawPage(embeddedRight, { x: this.pageW + 30, y: 0, width: this.pageW, height: this.pageH });
+
+    // }
 
     finalBookletDoc.setTitle(`${data.name} Character Booklet`);
 
