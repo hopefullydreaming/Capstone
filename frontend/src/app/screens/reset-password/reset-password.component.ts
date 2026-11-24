@@ -47,7 +47,7 @@ export class ResetPasswordComponent {
 
       this.authService.resetPassword(body).subscribe({
           next: () => {
-            this.router.navigate(['/login']);
+            this.router.navigate(['/login'], { state: { hint: "Password reset successful. Please log in" } });
           },
           error: (err) => {
             this.errorMsg.set(err.error);

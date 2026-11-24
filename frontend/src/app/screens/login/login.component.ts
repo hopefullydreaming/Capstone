@@ -22,11 +22,17 @@ export class LoginComponent {
   private router = inject(Router);
 
   errorMsg = signal<string>("");
+  hintMsg = signal<string>("");
 
   form: FormGroup = this.fb.group({
     email: ["", Validators.required],
     password: ["", Validators.required]
   });
+
+  ngOnInit() {
+
+    this.hintMsg.set(history.state.hint)
+  }
 
 
   goToSignUp() {

@@ -210,10 +210,10 @@ app.post('/forgot-password', async (req, res) => {
         if (err) throw err;
       });
 
-      const resetUrl = `http://localhost:4200/reset-password?token=${rawToken}`;
+      const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
 
       const { error } = await resend.emails.send({
-        from: 'Support <onboarding@resend.dev>', //Use 'onboarding@resend.dev' for initial testing
+        from: 'Support <no-reply@hope-hemingway-capstone-project.ca>',
         to: [user.email],
         subject: 'Reset Your Password',
         html: `
