@@ -1,6 +1,6 @@
 import { Component, signal, inject, computed } from '@angular/core';
 import { DataService } from '../../services/data.service';
-import { Class, Subclass, Species, Subspecies, Background, CharacterPayload, ClassFeature, SpeciesFeature, Resource, CharacterRecord } from "../../models/models";
+import { Class, Subclass, Species, Subspecies, Background, CharacterPayload, ClassFeature, SpeciesFeature, Resource, CharacterRecord, SKILLS } from "../../models/models";
 import { Router, ActivatedRoute } from '@angular/router'
 import { combineLatest } from 'rxjs';
 import { startWith } from 'rxjs/operators';
@@ -48,27 +48,6 @@ export class CharacterLevelComponent {
 
   choiceOptions: any[] = [];
   choiceId: string = "";
-
-  skillList = [
-    { id: "acrobatics", label: "Acrobatics" },
-    { id: "animalHandling", label: "Animal Handling" },
-    { id: "arcana", label: "Arcana" },
-    { id: "athletics", label: "Athletics" },
-    { id: "deception", label: "Deception" },
-    { id: "history", label: "History" },
-    { id: "insight", label: "Insight" },
-    { id: "intimidation", label: "Intimidation" },
-    { id: "investigation", label: "Investigation" },
-    { id: "medicine", label: "Medicine" },
-    { id: "nature", label: "Nature" },
-    { id: "perception", label: "Perception" },
-    { id: "performance", label: "Performance" },
-    { id: "persuasion", label: "Persuasion" },
-    { id: "religion", label: "Religion" },
-    { id: "sleightOfHand", label: "Sleight of Hand" },
-    { id: "stealth", label: "Stealth" },
-    { id: "survival", label: "Survival" }
-  ]
 
   asiTypes = [
     { id: "plusTwo", label: "One +2" },
@@ -187,7 +166,7 @@ export class CharacterLevelComponent {
           let data = JSON.parse(classObj.data);
 
 
-          this.skillChoices = this.skillList.filter(s => data.choice.skills.find((skill: any) => skill === s.id) !== undefined)
+          this.skillChoices = SKILLS.filter(s => data.choice.skills.find((skill: any) => skill === s.id) !== undefined)
 
           let skillsArray = this.fb.array([])
 
@@ -250,7 +229,7 @@ export class CharacterLevelComponent {
 
     if (choiceObj.exp) {
 
-      this.expChoices = this.skillList.filter(s => choiceObj.exp.find((skill: any) => skill === s.id) !== undefined);
+      this.expChoices = SKILLS.filter(s => choiceObj.exp.find((skill: any) => skill === s.id) !== undefined);
 
       let expsArray = this.fb.array([]);
       this.expLevel = choiceObj.level;
@@ -365,6 +344,9 @@ export class CharacterLevelComponent {
           ...features,
           speed: this.data.speed,
           saves: this.data.saves,
+          tools: this.data.tools,
+          armor: this.data.armor,
+          weapons: this.data.weapons,
           skills: skills,
           choices: choices,
           max_hp: maxHp,

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { PDFDocument, PDFName, rgb, PDFPage, PDFFont } from 'pdf-lib';
-import { ClassFeature, SpeciesFeature, Resource } from "../models/models";
+import { ClassFeature, SpeciesFeature, Resource, SKILLS, TOOLS, ARMOR, ALL_WEAPONS } from "../models/models";
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import datatable from '@primeng/themes/aura/datatable';
@@ -19,6 +19,9 @@ export interface CharacterData {
   speed: any;
   stats: StatBlock;
   senses: any[];
+  tools: any;
+  armor: any[];
+  weapons: any[];
   skills: any;
   saves: any;
   choices: any;
@@ -43,29 +46,6 @@ export class GeneratePdfService {
   private readonly contentWidth = 318;
 
   http = inject(HttpClient);
-
-
-  skillList = [
-    { id: "acrobatics", label: "Acrobatics" },
-    { id: "animalHandling", label: "Animal Handling" },
-    { id: "arcana", label: "Arcana" },
-    { id: "athletics", label: "Athletics" },
-    { id: "deception", label: "Deception" },
-    { id: "history", label: "History" },
-    { id: "insight", label: "Insight" },
-    { id: "intimidation", label: "Intimidation" },
-    { id: "investigation", label: "Investigation" },
-    { id: "medicine", label: "Medicine" },
-    { id: "nature", label: "Nature" },
-    { id: "perception", label: "Perception" },
-    { id: "performance", label: "Performance" },
-    { id: "persuasion", label: "Persuasion" },
-    { id: "religion", label: "Religion" },
-    { id: "sleightOfHand", label: "Sleight of Hand" },
-    { id: "stealth", label: "Stealth" },
-    { id: "survival", label: "Survival" }
-  ]
-
 
   async generateAccessibleBooklet(data: CharacterData) {
 
@@ -524,7 +504,7 @@ export class GeneratePdfService {
 
     page.drawText(skillsLabel, { x: x + labelX, y: startY - 12, size: 10, font: font });
 
-    this.skillList.forEach((skill, idx) => {
+    SKILLS.forEach((skill, idx) => {
 
       const startX = x;
       startY = startY - rowH;
@@ -598,16 +578,47 @@ export class GeneratePdfService {
 
     let skillsLabel = "Other Proficiencies";
 
+    let profString: string = "";
 
+    if (charData.tools) {
+      let profStrArray: string[] = []
+      let toolStrArray: string[] = []
+      let armorStrArray: string[] = []
+      let weaponStrArray: string[] = []
+
+      Object.keys(charData.tools).forEach((key) => {
+        let tool = TOOLS.find(t => t.id === key)
+        if (tool) {
+          toolStrArray.push(tool.label)
+        }
+      });
+
+      if(toolStrArray.length > 0) profStrArray.push(toolStrArray.join(", "));
+
+      charData.armor.forEach((key: string) => {
+        let armor = ARMOR.find(a => a.id === key)
+        if (armor) armorStrArray.push(armor.label)
+      })
+
+
+      if (armorStrArray.length > 0) profStrArray.push(armorStrArray.join(", "));
+
+      charData.weapons.forEach((key: string) => {
+        let weapon = ALL_WEAPONS.find(w => w.id === key)
+        if (weapon) weaponStrArray.push(weapon.label)
+      })
+
+      if (weaponStrArray.length > 0) profStrArray.push(weaponStrArray.join(", "));
+
+
+      profString = profStrArray.join("\n");
+    }
 
     page.drawRectangle({ x: x, y: startY - h, width: colW, height: h, borderColor: BLACK, borderWidth: 2 });
 
     page.drawText(skillsLabel, { x: x + 5, y: startY - 16, size: 12, font: font });
 
-    // placeholder
-    let profs = "Vivamus a urna imperdiet, bibendum turpis eu, vestibulum nibh. Sed eget libero diam. Praesent eget felis ut urna tempor auctor sit amet ac turpis. Praesent eget felis ut urna tempor auctor sit amet ac turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-
-    this.multiLineText(page, font, profs, startY - 32, 10, 12, colW - 10)
+    this.multiLineText(page, font, profString, startY - 32, 10, 12, colW - 10)
 
   }
 

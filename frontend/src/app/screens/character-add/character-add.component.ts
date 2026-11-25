@@ -1,6 +1,6 @@
 import { Component, signal, inject, computed } from '@angular/core';
 import { DataService } from '../../services/data.service';
-import { Class, Subclass, Species, Subspecies, Background, CharacterPayload, ClassFeature, SpeciesFeature, Source, HasSource } from "../../models/models";
+import { Class, Subclass, Species, Subspecies, Background, CharacterPayload, ClassFeature, SpeciesFeature, Source, HasSource, SIMPLE_WEAPONS, MARTIAL_WEAPONS } from "../../models/models";
 import { Router, ActivatedRoute } from '@angular/router'
 import { combineLatest } from 'rxjs';
 import { startWith } from 'rxjs/operators';
@@ -276,8 +276,11 @@ export class CharacterAddComponent {
 
     let features: any = {};
     let skills: any = {};
+    let tools: any = {};
     let resources: any[] = [];
     let senses: any[] = [];
+    let armor: string[] = [];
+    let weapons: string[] = [];
 
     this.dataService.getSpeciesFeatures(species_row_id, subspecies_row_id).subscribe({
       next: (d: SpeciesFeature[]) => {
@@ -304,6 +307,15 @@ export class CharacterAddComponent {
             if (!!featureData.skills) {
               skills = { ...skills, ...featureData.skills };
             }
+            if (!!featureData.armor) {
+              armor = [ ...armor, ...featureData.armor ];
+            }
+            if (!!featureData.weapons) {
+              weapons = [ ...weapons, ...featureData.weapons ];
+            }
+            if (!!featureData.tools) {
+              tools = { ...tools, ...featureData.tools };
+            }
             if (!!featureData.sense) {
 
               let index = senses.findIndex(s => s.name == featureData.sense.name)
@@ -326,32 +338,99 @@ export class CharacterAddComponent {
         let classObj = this.classes().find(c => c.row_id == class_row_id);
         let conMod = Math.floor((stats.constitution - 10) / 2);
 
+        let classData = JSON.parse(classObj.data);
+
         let maxHp = classObj.hit_dice + ((level - 1) * ((classObj.hit_dice / 2) + 1)) + (conMod * level)
 
         let saves = JSON.parse(classObj.data).saves
         let allskills = { ...skills, ...JSON.parse(bgObj.data).skills }
+        let alltools = { ...tools, ...JSON.parse(bgObj.data).tools, ...classData.tools }
+
+        let allweapons = [...classData.weapons, ...weapons];
+        let allarmor = [ ...classData.armor ?? [], ...armor];
+
+        let payloadData = {
+          ...features,
+          saves: saves,
+          skills: allskills,
+          max_hp: maxHp,
+          tools: alltools,
+          weapons: this.ensureUniqueWeapons(allweapons),
+          armor: this.ensureUniqueArmor(allarmor),
+          hit_dice: classObj.hit_dice,
+          resources: resources,
+          senses: senses,
+        }
 
         let payload = {
           row_id: this.row_id(),
           stats: stats,
           level: level,
-          data: JSON.stringify({
-            ...features,
-            saves: saves,
-            skills: allskills,
-            max_hp: maxHp,
-            hit_dice: classObj.hit_dice,
-            resources: resources,
-            senses: senses,
-          })
+          data: JSON.stringify(payloadData)
         }
 
         this.dataService.putCharacterData(payload, this.row_id()).subscribe(() => {
           this.router.navigate(['/character', this.row_id(), 'level', 1], { replaceUrl: true, state: { level: level, classObj: classObj } })
         });
+
       },
       error: (err) => console.error(err)
     });
+  }
+
+  ensureUnique(arr: string[]): string[] {
+    let out: string[] = [];
+    arr.forEach(s => {
+      if (!out.find(o => o === s)) {
+        out.push(s)
+      }
+    })
+    return out;
+  }
+
+  ensureUniqueArmor(arr: string[]): string[] {
+    let uniqueArr = this.ensureUnique(arr);
+    let out: string[] = [];
+
+    let all = !!uniqueArr.find(w => w === "all");
+    let light = !!uniqueArr.find(w => w === "light");
+    let medium = !!uniqueArr.find(w => w === "medium");
+    let heavy = !!uniqueArr.find(w => w === "heavy");
+    let shield = !!uniqueArr.find(w => w === "shield");
+
+    if (all || (light && medium && heavy)) {
+      out.push("all")
+      if (shield) {
+        out.push("shield")
+      }
+      return out;
+    }
+    return uniqueArr;
+  }
+
+
+  ensureUniqueWeapons(arr: string[]): string[] {
+    let uniqueArr = this.ensureUnique(arr);
+    let simple = !!uniqueArr.find(w => w === "simple");
+    let martial = !!uniqueArr.find(w => w === "martial");
+    let out: string[] = [];
+
+    if (simple) out.push("simple")
+    if (martial) out.push("martial")
+
+    if (simple && martial) return out;
+
+    uniqueArr.forEach(s => {
+      if (s !== "simple" && s !== "martial") {
+        let isSimple = !!SIMPLE_WEAPONS.find(w => w.id == s)
+        let isMartial = !!MARTIAL_WEAPONS.find(w => w.id == s)
+
+        if (!((simple && isSimple) || (martial && isMartial))) {
+          out.push(s)
+        }
+      }
+    })
+    return out;
   }
 
 

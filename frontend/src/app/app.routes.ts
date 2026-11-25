@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './services/auth-guard';
 import { LoginGuard } from './services/login-guard';
+import { HomebrewGuard } from './services/homebrew-guard';
 
 export const routes: Routes = [
 
@@ -61,6 +62,36 @@ export const routes: Routes = [
     loadComponent: () => import('./screens/character-level/character-level.component').then((m) => m.CharacterLevelComponent),
     canActivate: [AuthGuard]
   },
+
+
+  {
+    path: "homebrew",
+    loadComponent: () => import('./screens/homebrew-dashboard/homebrew-dashboard.component').then((m) => m.HomebrewDashboardComponent),
+    canActivate: [HomebrewGuard],
+    children: [
+      {
+        path: "classes",
+        loadComponent: () => import('./screens/homebrew-class-listing/homebrew-class-listing.component').then((m) => m.HomebrewClassListingComponent),
+        canActivate: [HomebrewGuard]
+      },
+      {
+        path: "subclasses",
+        loadComponent: () => import('./screens/homebrew-subclass-listing/homebrew-subclass-listing.component').then((m) => m.HomebrewSubclassListingComponent),
+        canActivate: [HomebrewGuard]
+      },
+      {
+        path: "species",
+        loadComponent: () => import('./screens/homebrew-species-listing/homebrew-species-listing.component').then((m) => m.HomebrewSpeciesListingComponent),
+        canActivate: [HomebrewGuard]
+      },
+      {
+        path: "subspecies",
+        loadComponent: () => import('./screens/homebrew-subspecies-listing/homebrew-subspecies-listing.component').then((m) => m.HomebrewSubspeciesListingComponent),
+        canActivate: [HomebrewGuard]
+      },
+    ]
+  },
+
 
   // redirects 
   { path: '', 

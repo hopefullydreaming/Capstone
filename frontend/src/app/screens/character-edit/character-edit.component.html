@@ -211,7 +211,7 @@
             <td class="p-1 border border-blue-300">
                 <div class="flex flex-col">
                     <p class="text-base">Other Proficiencies</p>
-                    <p class="text-sm">lorem ipsum</p>
+                    <p class="text-sm">{{toolString()}}</p>
                 </div>
             </td>
         </tr>
@@ -222,7 +222,7 @@
     @for(feature of character().species_features; track feature.row_id;){
     @if(feature.is_printed){
     <p class="font-bold pt-3">{{feature.name}}</p>
-    <p>{{feature.description}}</p>
+    <p class="whitespace-pre-line">{{feature.description}}</p>
 
     }
     }
@@ -230,7 +230,7 @@
 
     @for(feature of character().class_features; track feature.row_id;){
     <p class="font-bold pt-3">{{feature.name}}</p>
-    <p>{{getPrinted(feature)}}</p>
+    <p class="whitespace-pre-line">{{getPrinted(feature)}}</p>
     }
 
 

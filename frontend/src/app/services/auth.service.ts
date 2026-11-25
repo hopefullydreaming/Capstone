@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, of, shareReplay, BehaviorSubject, catchError } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,6 +13,12 @@ export class AuthService {
 
   isLoggedIn$ = new BehaviorSubject<boolean>(false);
   public isLoggedIn = toSignal(this.isLoggedIn$)
+
+  homebrewId$ = new BehaviorSubject<number>(-1);
+  public homebrewId = toSignal(this.homebrewId$);
+
+  isHomebrewer$ = new BehaviorSubject<boolean>(false);
+  public isHomebrewer = toSignal(this.isHomebrewer$);
 
   userName$ = new BehaviorSubject<string>('');
   public userName = toSignal(this.userName$)
@@ -61,6 +67,8 @@ export class AuthService {
   private setSession(authResult: any) {
     this.isLoggedIn$.next(true);
     this.userName$.next(authResult.username);
+    this.isHomebrewer$.next(!!authResult.homebrew_row_id);
+    this.homebrewId$.next(authResult.homebrew_row_id ?? -1);
   }
 
 
@@ -72,6 +80,8 @@ export class AuthService {
         tap((val) => {
           this.userName$.next(null);
           this.isLoggedIn$.next(false);
+          this.isHomebrewer$.next(false);
+          this.homebrewId$.next(-1);
         }),
         shareReplay());
   }

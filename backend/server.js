@@ -85,7 +85,8 @@ app.post('/signupattempt', async (req, res) => {
     // Create payload for JWT
     const payload = {
       id: id,
-      username: username
+      username: username,
+      homebrew_row_id: null
     };
 
     // Sign token
@@ -100,7 +101,7 @@ app.post('/signupattempt', async (req, res) => {
       path: '/',
       maxAge: 60 * 60 * 1000
     });
-    res.json({ message: 'Login successful', username });
+    res.json({ message: 'Login successful', username, homebrew_row_id: null });
 
     res.send(result);
 
@@ -135,10 +136,12 @@ app.post('/loginattempt', async (req, res) => {
       if (isMatch) {
         username = user.username;
         id = user.row_id;
+        homebrew_row_id = user.homebrew_row_id
 
         const payload = {
           id: id,
-          username: username
+          username: username,
+          homebrew_row_id: homebrew_row_id
         };
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
@@ -153,7 +156,7 @@ app.post('/loginattempt', async (req, res) => {
           maxAge: 60 * 60 * 1000
         });
 
-        res.json({ message: 'Login successful', username });
+        res.json({ message: 'Login successful', username, homebrew_row_id });
 
       } else {
         res.status(401).send('Email or password is incorrect.');
@@ -335,7 +338,8 @@ const authenticateJWT = (req, res, next) => {
 app.get('/api/username', authenticateJWT, async (req, res) => {
   res.json({
     id: req.user.id,
-    username: req.user.username
+    username: req.user.username,
+    homebrew_row_id: req.user.homebrew_row_id
   });
 });
 

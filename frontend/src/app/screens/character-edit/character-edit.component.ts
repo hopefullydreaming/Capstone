@@ -1,6 +1,10 @@
 import { Component, signal, inject } from '@angular/core';
 import { DataService } from '../../services/data.service';
-import { CharacterRecord, ClassFeature, SpeciesFeature, Resource, CharacterDetail } from "../../models/models";
+import {
+  CharacterRecord, ClassFeature, SpeciesFeature, Resource, CharacterDetail,
+  SKILLS, TOOLS, ABILITIES, ALL_WEAPONS, ARMOR
+
+} from "../../models/models";
 import { ActivatedRoute, Router } from '@angular/router'
 import { FloorPipe } from '../../pipes/floor-pipe';
 import { GeneratePdfService, CharacterData, StatBlock } from '../../services/generate-pdf.service'
@@ -33,37 +37,12 @@ export class CharacterEditComponent {
 
   resources: Resource[] = []
   senses: any[] = []
+  tools: Array<{id: string, label: string}> = []
+  toolString = signal<string>("");
 
-  skillList = [
-    { id: "acrobatics", label:"Acrobatics" },
-    { id: "animalHandling", label: "Animal Handling" },
-    { id: "arcana", label: "Arcana" },
-    { id: "athletics", label: "Athletics" },
-    { id: "deception", label: "Deception" },
-    { id: "history", label: "History" },
-    { id: "insight", label: "Insight" },
-    { id: "intimidation", label: "Intimidation" },
-    { id: "investigation", label: "Investigation" },
-    { id: "medicine", label: "Medicine" },
-    { id: "nature", label: "Nature" },
-    { id: "perception", label: "Perception" },
-    { id: "performance", label: "Performance" },
-    { id: "persuasion", label: "Persuasion" },
-    { id: "religion", label: "Religion" },
-    { id: "sleightOfHand", label: "Sleight of Hand" },
-    { id: "stealth", label: "Stealth" },
-    { id: "survival", label: "Survival" }
-  ]
+  skillList = SKILLS;
 
-
-  abilityList = [
-    { id: "strength", label:"STR" },
-    { id: "dexterity", label: "DEX" },
-    { id: "constitution", label: "CON" },
-    { id: "intelligence", label: "INT" },
-    { id: "wisdom", label: "WIS" },
-    { id: "charisma", label: "CHA" }
-  ]
+  abilityList = ABILITIES;
 
 
   ngOnInit() {
@@ -78,12 +57,29 @@ export class CharacterEditComponent {
         this.char = data;
         this.data = JSON.parse(data.data);
 
-        // this.resources = this.data.resources; 
         this.data.resources.forEach((r: Resource) => {
           this.resources.push({...r, max_value: this.getResourceMax(r.max)})
         })
 
+        let toolStrArray: string[] = []
 
+        if (this.data.tools) Object.keys(this.data.tools).forEach((key) => {
+          let tool = TOOLS.find(t => t.id === key)
+          if (tool) toolStrArray.push(tool.label)
+        });
+
+        this.data.armor.forEach((key: string) => {
+          let armor = ARMOR.find(a => a.id === key)
+          if (armor) toolStrArray.push(armor.label)
+        })
+
+        this.data.weapons.forEach((key: string) => {
+          let weapon = ALL_WEAPONS.find(w => w.id === key)
+          if (weapon) toolStrArray.push(weapon.label)
+        })
+
+        this.toolString.set(toolStrArray.join(", "))
+        
         this.senses = this.data.senses;
 
         let rowNum = 13 + this.senses.length - this.resources.length
@@ -128,26 +124,6 @@ export class CharacterEditComponent {
     return 1;
   }
 
-  // getFeatures() {
-
-  //   this.dataService.getClassFeatures(this.character().class_row_id, this.character().level, this.character().subclass_row_id).subscribe({
-  //     next: (data: ClassFeature[]) => {
-  //       this.classFeatures.set(data);
-  //     },
-  //     error: (err) => console.error(err)
-  //   });
-
-
-  //   this.dataService.getSpeciesFeatures(this.character().species_row_id, this.character().subspecies_row_id).subscribe({
-  //     next: (data: SpeciesFeature[]) => {
-  //       this.speciesFeatures.set(data);
-  //     },
-  //     error: (err) => console.error(err)
-  //   });
-
-
-  // }
-
   displayModifier(ability: string): string {
     let mod = this.getModifier(ability);
 
@@ -179,6 +155,9 @@ export class CharacterEditComponent {
         cha: this.char.charisma,
       },
       speed: this.data.speed,
+      tools: this.data.tools ?? {},
+      armor: this.data.armor ?? [],
+      weapons: this.data.weapons ?? [],
       max_hp: this.data.max_hp,
       level: this.char.level,
       name: this.char.name,

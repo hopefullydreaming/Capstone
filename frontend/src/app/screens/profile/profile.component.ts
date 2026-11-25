@@ -28,4 +28,8 @@ export class ProfileComponent {
     console.log("PLACEHOLDER FOR HOMEBREW APPLY")
   }
 
+  homebrewNav() {
+    this.router.navigate(['/homebrew'])
+  }
+
 }
